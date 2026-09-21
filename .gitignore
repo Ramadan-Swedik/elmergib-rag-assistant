@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+venv/
+env/
+# ChromaDB & Local DBs
+chroma_db/
+*.sqlite3
+bm25_index/
+# Documents & Models
+*.pdf
+*.bin
+*.safetensors
+# Environment & Keys
+.env
+.env.local
+# IDEs
+.vscode/
+.idea/
