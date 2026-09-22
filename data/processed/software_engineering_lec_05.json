@@ -1,0 +1,52 @@
+{
+  "doc_id": "software_engineering_lec_05",
+  "file_name": "software_engineering_05.pdf",
+  "title": "مادة هندسة البرمجيات - المحاضرة 5",
+  "category": "subject_course",
+  "source_url": "https://drive.google.com/drive/folders/1BueyYIBcVObbiZctbEMCGcq_IS8FDR2H?usp=sharing",
+  "retrieved_at": "2026-09-22",
+  "pages": [
+    {
+      "page_number": 1,
+      "text": "Introduction to software Engineering\nITGS-213"
+    },
+    {
+      "page_number": 2,
+      "text": "Requirements Specifications \nSoftware Requirements Specifications (SRS)\nRequirements Specifications"
+    },
+    {
+      "page_number": 3,
+      "text": "Requirements Specifications \nRequirements Specifications"
+    },
+    {
+      "page_number": 4,
+      "text": "Requirements Specifications \nRequirements Specifications"
+    },
+    {
+      "page_number": 5,
+      "text": "Requirements Specifications \nPerformance Requirements:\nResponse time.Memory.\nValidation/Acceptance Criteria:\nQuality attributes\nRequirements Specifications"
+    },
+    {
+      "page_number": 6,
+      "text": "(4\nRequirements Specifications \nRequirements Specifications"
+    },
+    {
+      "page_number": 7,
+      "text": ")(\nRequirements Validation\n)(\nRequirements Validation"
+    },
+    {
+      "page_number": 8,
+      "text": "Requirements Management\nRequirements Management"
+    },
+    {
+      "page_number": 9,
+      "text": "Software Configuration management SCM\nThe end user should understand the key SCM terms to ensure he has the \nlatest version of the software\nSoftware Configuration management SCM"
+    },
+    {
+      "page_number": 10,
+      "text": "Software Configuration management SCM\nchange)\n:\nBase-Line"
+    }
+  ],
+  "full_text": "Introduction to software Engineering\nITGS-213\n\nRequirements Specifications \nSoftware Requirements Specifications (SRS)\nRequirements Specifications\n\nRequirements Specifications \nRequirements Specifications\n\nRequirements Specifications \nRequirements Specifications\n\nRequirements Specifications \nPerformance Requirements:\nResponse time.Memory.\nValidation/Acceptance Criteria:\nQuality attributes\nRequirements Specifications\n\n(4\nRequirements Specifications \nRequirements Specifications\n\n)(\nRequirements Validation\n)(\nRequirements Validation\n\nRequirements Management\nRequirements Management\n\nSoftware Configuration management SCM\nThe end user should understand the key SCM terms to ensure he has the \nlatest version of the software\nSoftware Configuration management SCM\n\nSoftware Configuration management SCM\nchange)\n:\nBase-Line",
+  "char_count": 822
+}

@@ -1,0 +1,80 @@
+{
+  "doc_id": "computer_networks_lec_03",
+  "file_name": "computer_networks_03.pdf",
+  "title": "مادة شبكات الحاسوب - المحاضرة 3",
+  "category": "subject_course",
+  "source_url": "https://drive.google.com/drive/folders/1TeDh9jJgLQDQfsvmAGSBVXI6NF3d4PWH?usp=sharing",
+  "retrieved_at": "2026-09-22",
+  "pages": [
+    {
+      "page_number": 1,
+      "text": "OSI and TCP/IP Model"
+    },
+    {
+      "page_number": 3,
+      "text": "OSI"
+    },
+    {
+      "page_number": 8,
+      "text": "Layer 6 (Presentation Layer)"
+    },
+    {
+      "page_number": 9,
+      "text": "Layer 5 (Session Layer)\nlayer Session"
+    },
+    {
+      "page_number": 10,
+      "text": "Layer 4 (Transport Layer)"
+    },
+    {
+      "page_number": 12,
+      "text": "TCP \nUDP"
+    },
+    {
+      "page_number": 13,
+      "text": "IP"
+    },
+    {
+      "page_number": 14,
+      "text": "Maximum Transmission Unit (MTU)"
+    },
+    {
+      "page_number": 16,
+      "text": "IP\n\nIP\n80HTTP"
+    },
+    {
+      "page_number": 18,
+      "text": "Layer 3 (Network Layer)\nRouting"
+    },
+    {
+      "page_number": 19,
+      "text": "GoogleGPS\n\nRouters\npacket\nRouting Table\n IP"
+    },
+    {
+      "page_number": 20,
+      "text": "Static Routing\nDynamic Routing\nRIPOSPF"
+    },
+    {
+      "page_number": 21,
+      "text": "RIP)Routing Information Protocol\nRIP\nRIP\nhops\nDirected Connected \n0\n\nDefault Routing"
+    },
+    {
+      "page_number": 22,
+      "text": "Layer 2 (Data Link Layer)"
+    },
+    {
+      "page_number": 23,
+      "text": "Layer 1 (Physical Layer)\nbits\n01\n\nWifi"
+    },
+    {
+      "page_number": 24,
+      "text": "Data Encapsulation and De-encapsulation (TCP/IP model) \n Data Encapsulation\nIP\n De-encapsulation"
+    },
+    {
+      "page_number": 25,
+      "text": "Data Encapsulation \nData \nSegment \nIPPacket \nMAC\nFrame \nData-Link\nBits \nSwitch"
+    }
+  ],
+  "full_text": "OSI and TCP/IP Model\n\nOSI\n\nLayer 6 (Presentation Layer)\n\nLayer 5 (Session Layer)\nlayer Session\n\nLayer 4 (Transport Layer)\n\nTCP \nUDP\n\nIP\n\nMaximum Transmission Unit (MTU)\n\nIP\n\nIP\n80HTTP\n\nLayer 3 (Network Layer)\nRouting\n\nGoogleGPS\n\nRouters\npacket\nRouting Table\n IP\n\nStatic Routing\nDynamic Routing\nRIPOSPF\n\nRIP)Routing Information Protocol\nRIP\nRIP\nhops\nDirected Connected \n0\n\nDefault Routing\n\nLayer 2 (Data Link Layer)\n\nLayer 1 (Physical Layer)\nbits\n01\n\nWifi\n\nData Encapsulation and De-encapsulation (TCP/IP model) \n Data Encapsulation\nIP\n De-encapsulation\n\nData Encapsulation \nData \nSegment \nIPPacket \nMAC\nFrame \nData-Link\nBits \nSwitch",
+  "char_count": 632
+}
