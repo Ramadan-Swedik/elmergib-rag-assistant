@@ -3,6 +3,7 @@ chromadb
 pypdf
 rank-bm25
 sentence-transformers
+FlagEmbedding
 ollama
 ragas
 pandas
