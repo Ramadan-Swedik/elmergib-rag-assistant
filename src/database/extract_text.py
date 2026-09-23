@@ -1,10 +1,16 @@
+"""
+PDF Text Extraction and Cleaning Module.
+Owner: Mohammed
+Domain: src/database/
+Goal: Extract page-by-page text from raw PDFs, filter out ToC pages, and normalize Arabic text.
+"""
 import json
 import re
 import sys
 from pathlib import Path
 
-# إضافة مجلد الجذر الرئيسي للمشروع إلى مسارات بايثون لتفادي خطأ ModuleNotFoundError
-sys.path.append(str(Path(__file__).resolve().parent.parent))
+# Add project root directory to sys.path (3 levels up)
+sys.path.append(str(Path(__file__).resolve().parent.parent.parent))
 
 from pypdf import PdfReader
 from config import (
@@ -16,7 +22,7 @@ from config import (
 
 
 def is_table_of_contents_page(text: str) -> bool:
-    """تحديد واستبعاد صفحات الفهارس الممتلئة بالنقاط المتكررة (ToC Filter)"""
+    """Identify and filter out table of contents (ToC) pages with repetitive dots."""
     if not text:
         return False
     dot_count = text.count(".") + text.count("…")
@@ -26,24 +32,24 @@ def is_table_of_contents_page(text: str) -> bool:
 
 
 def normalize_arabic(text: str) -> str:
-    """تنظيف وتوحيد أحرف النص العربي مع الحفاظ على فواصل الفقرات"""
+    """Normalize Arabic characters and clean spaces while preserving paragraph breaks."""
     if not text:
         return ""
 
     text = re.sub(r"[إأآٱ]", "ا", text)
     text = re.sub(r"ى", "ي", text)
-    text = re.sub(r"[\u064B-\u0652]", "", text)  # إزالة التشكيل
-    text = re.sub(r"ـ+", "", text)              # إزالة التطويل
-    text = re.sub(r"[ \t]+", " ", text)          # توحيد المسافات الأفقية فقط
-    text = re.sub(r"\n\s*\n", "\n\n", text)      # تقليص الأسطر الفارغة المتكررة
+    text = re.sub(r"[\u064B-\u0652]", "", text)  # Remove diacritics
+    text = re.sub(r"ـ+", "", text)              # Remove tatweel
+    text = re.sub(r"[ \t]+", " ", text)          # Normalize horizontal spaces
+    text = re.sub(r"\n\s*\n", "\n\n", text)      # Collapse multiple blank lines
 
     return text.strip()
 
 
 def extract_pages_from_pdf(pdf_path: Path) -> list[dict]:
-    """استخراج النصوص صفحة بصفحة مع تتبع الأرقام واستبعاد الفهارس مع معالجة الأخطاء"""
+    """Extract page-by-page text, tracking page numbers and excluding ToC pages with error handling."""
     if not pdf_path.exists():
-        print(f"⚠️ ملف غير موجود: {pdf_path.name}")
+        print(f"⚠️ File not found: {pdf_path.name}")
         return []
 
     extracted_pages = []
@@ -54,7 +60,7 @@ def extract_pages_from_pdf(pdf_path: Path) -> list[dict]:
             raw_text = page.extract_text() or ""
 
             if is_table_of_contents_page(raw_text):
-                print(f"  🛑 تم استبعاد الصفحة {idx} من {pdf_path.name} (صفحة فهرس/نقاط).")
+                print(f"  🛑 Skipped page {idx} from {pdf_path.name} (ToC/dotted page).")
                 continue
 
             cleaned_text = normalize_arabic(raw_text)
@@ -64,27 +70,27 @@ def extract_pages_from_pdf(pdf_path: Path) -> list[dict]:
                     "text": cleaned_text
                 })
     except Exception as e:
-        print(f"❌ خطأ أثناء قراءة الملف {pdf_path.name}: {e}")
+        print(f"❌ Error reading file {pdf_path.name}: {e}")
 
     return extracted_pages
 
 
 def main():
     if not SOURCES_MANIFEST_PATH.exists():
-        raise FileNotFoundError(f"ملف المصادر غير موجود: {SOURCES_MANIFEST_PATH}")
+        raise FileNotFoundError(f"❌ Sources manifest file not found: {SOURCES_MANIFEST_PATH}")
 
     with open(SOURCES_MANIFEST_PATH, "r", encoding="utf-8") as f:
         sources = json.load(f)
 
     all_processed_docs = []
 
-    print(f"🚀 بدء معالجة {len(sources)} مستند باستعمال إعدادات config.py...\n")
+    print(f"🚀 Starting extraction and cleaning for {len(sources)} documents using config.py settings...\n")
 
     for source in sources:
         file_name = source["file_name"]
         pdf_path = RAW_DATA_DIR / file_name
 
-        print(f"📄 معالجة: {file_name}")
+        print(f"📄 Processing: {file_name}")
         pages_data = extract_pages_from_pdf(pdf_path)
         full_text = "\n\n".join([p["text"] for p in pages_data])
 
@@ -102,17 +108,17 @@ def main():
 
         all_processed_docs.append(doc_payload)
 
-        # حفظ المستند المعالج منفصلاً
+        # Save single processed document json
         single_doc_path = PROCESSED_DATA_DIR / f"{source['doc_id']}.json"
         with open(single_doc_path, "w", encoding="utf-8") as f:
             json.dump(doc_payload, f, ensure_ascii=False, indent=2)
 
-    # حفظ الملف الشامل للمستندات المعالجة
+    # Save master processed documents file
     master_file_path = PROCESSED_DATA_DIR / "cleaned_documents.json"
     with open(master_file_path, "w", encoding="utf-8") as f:
         json.dump(all_processed_docs, f, ensure_ascii=False, indent=2)
 
-    print(f"\n✅ اكتمل الاستخراج والتنظيف بنجاح داخل: {PROCESSED_DATA_DIR}")
+    print(f"\n✅ Extraction and cleaning completed successfully in: {PROCESSED_DATA_DIR}")
 
 
 if __name__ == "__main__":
