@@ -1,5 +1,5 @@
 """
-Data Ingestion and Indexing Module.
+Data Ingestion and Indexing Module - Strict WORKFLOW Standard.
 Owner: Mohammed
 Domain: data/ + src/database/
 Goal: Deliver a clean, queryable dual index (Dense + BM25) from all official documents.
@@ -29,14 +29,19 @@ BM25_INDEX_PATH = BASE_DIR / "src" / "database" / "bm25_index.pkl"
 
 
 def tokenize_arabic_text(text: str) -> list[str]:
-    """Tokenize Arabic text into keywords accounting for punctuation marks."""
-    return re.findall(r"\w+", text)
+    """Tokenize and normalize text into lowercase terms for BM25 keyword search."""
+    if not text:
+        return []
+    return re.findall(r"\w+", text.lower())
 
 
 def build_dense_index(chunks: list[dict]) -> int:
     """Generate Dense embeddings using BAAI/bge-m3 and store in ChromaDB."""
     print(f"\n🤖 [2/3] Building ChromaDB vector index using ({MODEL_NAME})...")
-    
+
+    # Ensure vector store parent directory exists
+    VECTORSTORE_DIR.mkdir(parents=True, exist_ok=True)
+
     # Auto-detect GPU/CPU environment for fp16 precision
     use_fp16 = torch.cuda.is_available()
     model = BGEM3FlagModel(MODEL_NAME, use_fp16=use_fp16)
@@ -50,22 +55,28 @@ def build_dense_index(chunks: list[dict]) -> int:
     batch_size = 32
     for i in range(0, len(chunks), batch_size):
         batch = chunks[i : i + batch_size]
-        texts = [item["text"] for item in batch]
-        ids = [item["chunk_id"] for item in batch]
+        texts = [item.get("text", "") for item in batch]
+        
+        # Safe Chunk IDs with index fallback
+        ids = [
+            str(item.get("chunk_id") or f"chunk_{i + idx}") 
+            for idx, item in enumerate(batch)
+        ]
+
+        # Strict WORKFLOW Metadata Schema (Safe Conversion against None values)
         metadatas = [
             {
-                "doc_id": item["doc_id"],
-                "file_name": item["file_name"],
-                "title": item["title"],
-                "category": item["category"],
-                "source_url": item["source_url"],
-                "page_number": item["page_number"],
-                "char_count": item["char_count"]
+                "doc_id": str(item.get("doc_id") or ""),
+                "doc_name": str(item.get("doc_name") or item.get("title") or ""),
+                "source_url": str(item.get("source_url") or ""),
+                "retrieved_at": str(item.get("retrieved_at") or ""),
+                "page_number": int(item.get("page_number") or 1),
             }
             for item in batch
         ]
 
-        embeddings_result = model.encode(texts, batch_size=len(texts), max_length=8192)
+        # Efficient max_length tailored for ~500-1000 char chunks
+        embeddings_result = model.encode(texts, batch_size=len(texts), max_length=1024)
         dense_embeddings = embeddings_result["dense_vecs"].tolist()
 
         collection.upsert(
@@ -80,9 +91,9 @@ def build_dense_index(chunks: list[dict]) -> int:
 
 
 def build_sparse_index(chunks: list[dict]):
-    """Generate Sparse (BM25) index with punctuation-aware tokenization."""
+    """Generate Sparse (BM25) index with normalized tokenization."""
     print("\n🔍 [3/3] Building and updating BM25 sparse index...")
-    tokenized_corpus = [tokenize_arabic_text(c["text"]) for c in chunks]
+    tokenized_corpus = [tokenize_arabic_text(c.get("text", "")) for c in chunks]
     bm25 = BM25Okapi(tokenized_corpus)
 
     bm25_payload = {
