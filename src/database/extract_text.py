@@ -108,12 +108,7 @@ def main():
 
         all_processed_docs.append(doc_payload)
 
-        # Save single processed document json
-        single_doc_path = PROCESSED_DATA_DIR / f"{source['doc_id']}.json"
-        with open(single_doc_path, "w", encoding="utf-8") as f:
-            json.dump(doc_payload, f, ensure_ascii=False, indent=2)
-
-    # Save master processed documents file
+    # Save master processed documents file only (cleaned & standardized)
     master_file_path = PROCESSED_DATA_DIR / "cleaned_documents.json"
     with open(master_file_path, "w", encoding="utf-8") as f:
         json.dump(all_processed_docs, f, ensure_ascii=False, indent=2)
