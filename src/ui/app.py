@@ -1,314 +1,214 @@
+"""
+Streamlit Web Interface.
+Owner: Ramadan
+Domain: src/ui/
+Goal: Deliver a working Streamlit chat interface calling answer_question().
+"""
 import streamlit as st
-import datetime
 import sys
 import os
 
-# ---------------------------------------------------------
-# Backend Pipeline Integration
-# ---------------------------------------------------------
-# Ensure src is in the python path to import the real rag pipeline
+# Ensure src is in the python path to import rag pipeline
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 from src.rag.pipeline import answer_question
 
-# ---------------------------------------------------------
-# Page Configuration & Styling
-# ---------------------------------------------------------
-st.set_page_config(
-    page_title="Elmergib Smart Assistant 🎓",
-    page_icon="🎓",
-    layout="wide"
-)
+# --- STYLES INJECTION ---
+CSS = """
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 
-# 100% Local Privacy CSS Injection (Zero External Fonts or CDNs)
-st.markdown(
-    """
-    <style>
-    /* System font stack for strict local privacy */
     html, body, [class*="css"] {
-        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        font-family: 'Geist', sans-serif !important;
     }
     
-    /* Sidebar Distinct Background */
-    section[data-testid="stSidebar"] {
-        background-color: #0b1c30;
-        color: #f8f9ff;
-    }
-    section[data-testid="stSidebar"] * {
-        color: #e5eeff;
-    }
-    section[data-testid="stSidebar"] hr {
-        border-color: rgba(255, 255, 255, 0.12);
-    }
-    
-    /* Chat Message Bubbles with Generous Padding, Soft Shadows & 12px Radius */
-    div[data-testid="stChatMessage"] {
-        border-radius: 12px;
-        padding: 1.25rem 1.5rem;
-        margin-bottom: 1.25rem;
-        box-shadow: 0 2px 8px rgba(11, 28, 48, 0.05);
-        background-color: #ffffff;
-        border: 1px solid #e2e8f0;
-        line-height: 1.65;
+    /* Variables for Light/Dark */
+    :root {
+        --card-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        --banner-bg: #FEF3C7;
+        --banner-text: #B45309;
+        --banner-border: #FDE68A;
+        
+        --abstention-border: #F43F5E;
+        --abstention-bg: #FFF1F2;
+        --abstention-text: #9F1239;
+        
+        --citation-bg: #F8FAFC;
+        --citation-border: #E2E8F0;
     }
     
-    /* User Message Visual Distinction */
-    div[data-testid="stChatMessage"]:has(div[aria-label="Chat message from user"]) {
-        background-color: #f1f5f9;
-        border: 1px solid #cbd5e1;
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --card-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            --banner-bg: rgba(180, 83, 9, 0.2);
+            --banner-text: #FDE68A;
+            --banner-border: rgba(180, 83, 9, 0.5);
+            
+            --abstention-border: #E11D48;
+            --abstention-bg: rgba(225, 29, 72, 0.1);
+            --abstention-text: #FDA4AF;
+            
+            --citation-bg: #1E293B;
+            --citation-border: #334155;
+        }
     }
 
-    /* Scope Boundary / Abstention Card */
-    .abstention-card {
-        background-color: #fef2f2;
-        border: 1px solid #fecaca;
-        border-left: 5px solid #ba1a1a;
-        border-radius: 10px;
-        padding: 1.1rem 1.3rem;
-        margin: 0.75rem 0;
-        color: #7f1d1d;
+    /* Disclaimer Banner */
+    div[data-testid="stAlert"] {
+        background-color: var(--banner-bg) !important;
+        color: var(--banner-text) !important;
+        border: 1px solid var(--banner-border) !important;
+        border-radius: 8px !important;
+        padding: 12px 16px !important;
     }
-    .abstention-card h4 {
-        margin: 0 0 0.5rem 0;
-        color: #991b1b;
-        font-size: 1.05rem;
-        font-weight: 700;
+
+    /* Sidebar tweaks */
+    section[data-testid="stSidebar"] {
+        background-color: var(--citation-bg) !important;
+        border-right: 1px solid var(--citation-border) !important;
+    }
+
+    /* Chat Messages */
+    div[data-testid="stChatMessage"] {
+        border-radius: 12px !important;
+        padding: 16px !important;
+        box-shadow: var(--card-shadow) !important;
+        margin-bottom: 1rem !important;
+        border: 1px solid var(--citation-border) !important;
+        background-color: transparent !important;
+    }
+
+    /* Scope Boundary Card */
+    .abstention-card {
+        background-color: var(--abstention-bg);
+        border: 1px solid var(--abstention-border);
+        border-left: 4px solid var(--abstention-border);
+        border-radius: 12px;
+        padding: 16px;
+        margin: 16px 0;
+        color: var(--abstention-text);
+    }
+    .abstention-header {
+        font-weight: 600;
+        margin-bottom: 8px;
         display: flex;
         align-items: center;
-        gap: 0.5rem;
-    }
-    .abstention-card p {
-        margin: 0.35rem 0;
-        font-size: 0.95rem;
-        line-height: 1.55;
-    }
-    .abstention-badge {
-        display: inline-block;
-        background-color: #fee2e2;
-        color: #991b1b;
-        font-size: 0.75rem;
-        font-weight: 600;
-        padding: 0.15rem 0.5rem;
-        border-radius: 4px;
-        margin-bottom: 0.5rem;
-        font-family: monospace;
-    }
-    .abstention-referral {
-        margin-top: 0.75rem;
-        padding-top: 0.6rem;
-        border-top: 1px dashed #fca5a5;
-        font-size: 0.88rem;
-        color: #374151;
+        gap: 8px;
     }
 
-    /* Citation blockquote styling */
-    blockquote.citation-quote {
-        margin: 0.75rem 0 0.5rem 0;
-        padding: 0.75rem 1rem;
-        background-color: #f8fafc;
-        border-left: 4px solid #00236f;
-        border-radius: 6px;
+    /* Citation Blockquote */
+    .citation-quote {
+        border-left: 4px solid var(--citation-border);
+        padding: 12px 16px;
+        background-color: var(--citation-bg);
+        border-radius: 0 8px 8px 0;
         font-style: italic;
-        color: #1e293b;
-        line-height: 1.6;
+        margin: 12px 0;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.9em;
     }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
 
-# ---------------------------------------------------------
-# Sidebar: Institutional Context & Reference
-# ---------------------------------------------------------
-with st.sidebar:
-    # Attempt to load the university logo if available
-    logo_path = os.path.join(os.path.dirname(__file__), "assets", "logo.png")
-    if os.path.exists(logo_path):
-        st.image(logo_path, use_container_width=True)
+    div[data-testid="stExpander"] {
+        border-radius: 12px !important;
+        box-shadow: var(--card-shadow) !important;
+        border: 1px solid var(--citation-border) !important;
+    }
+</style>
+"""
+
+
+def main():
+    st.set_page_config(page_title="Elmergib Smart Assistant", page_icon="🎓", layout="wide")
+    st.markdown(CSS, unsafe_allow_html=True)
+    
+    # --- SIDEBAR ---
+    with st.sidebar:
+        st.markdown("### 🎓 UniLabs")
+        st.markdown("---")
         
-    st.markdown("### 🏛️ جامعة المرقب")
-    st.markdown("**Elmergib University**")
-    st.caption("Official Regulations & Academic Guidance System")
+        st.button("🔬 Research", use_container_width=True, type="primary")
+        st.button("💬 Chat History", use_container_width=True)
+        st.button("📚 Library", use_container_width=True)
+        
+        st.markdown("---")
+        st.markdown("### ⚙️ Settings")
+        
+        theme = st.radio("UI Theme", ["System Default", "Light Mode", "Dark Mode"], 
+                         help="Note: Native Streamlit theming is fully controlled via the top-right '⋮' Menu -> Settings.")
+        
+        st.markdown("---")
+        st.caption("ENVIRONMENT\n\n**v4.2-Academic**")
+
+    # --- MAIN CONTENT ---
+    # Top Banner
+    st.warning("⚠️ **Disclaimer:** This prototype is an informational research proof-of-concept. It is not an official university decision channel, and outputs should not be treated as formal administrative rulings.", icon="⚠️")
+    
+    st.title("Elmergib Smart Assistant")
+    
+    col1, col2 = st.columns([3, 1])
+    with col1:
+        st.markdown("#### Synthesis Query: RAG in Clinical NLP")
+        st.caption("Corpus scope: Peer-reviewed journal literature (2022–2024) • Target DOI cross-checks active")
+    with col2:
+        st.button("📥 Export LaTeX")
+    
     st.markdown("---")
     
-    st.markdown("#### 📚 Regulatory Corpus")
-    st.markdown("- **Decree 501 (2010):** National Higher Education Bylaws")
-    st.markdown("- **Faculty Handbook:** Edition 2023/2024")
-    st.markdown("- **Jurisdiction:** Al-Khums & Affiliated Campuses")
-    st.markdown("- **Mode:** Grounded Regulatory Citation Only")
-    
-    st.markdown("---")
-    st.markdown("#### 🔒 Privacy & Compliance")
-    st.caption("100% Local Inference Guarantee. No external fonts, CDNs, or third-party telemetry.")
-    
-    if st.button("🗑️ Clear Chat History", use_container_width=True):
+    # Chat History
+    if "messages" not in st.session_state:
         st.session_state.messages = []
-        st.rerun()
-
-# ---------------------------------------------------------
-# Permanent Research Disclaimer Banner
-# ---------------------------------------------------------
-st.warning("⚠️ Disclaimer: This prototype is an informational research proof-of-concept. It is not an official university decision channel.")
-
-# ---------------------------------------------------------
-# Header Layout: Title on Left, Export LaTeX on Right
-# ---------------------------------------------------------
-col_title, col_export = st.columns([4, 1])
-
-with col_title:
-    st.title("Elmergib Smart Assistant 🎓")
-    st.caption("المساعد الذكي للوائح وأنظمة جامعة المرقب | Official Academic Inquiry Engine")
-
-# LaTeX Export Helper
-def generate_latex_transcript(messages):
-    tex = [
-        r"\documentclass[11pt,a4paper]{article}",
-        r"\usepackage[utf8]{inputenc}",
-        r"\usepackage{geometry}",
-        r"\geometry{margin=1in}",
-        r"\usepackage{xcolor}",
-        r"\usepackage{hyperref}",
-        r"\title{\textbf{Elmergib Smart Assistant Transcript}}",
-        r"\author{Academic Regulations Guidance System}",
-        rf"\date{{{datetime.date.today().strftime('%B %d, %Y')}}}",
-        r"\begin{document}",
-        r"\maketitle",
-        r"\section*{Disclaimer}",
-        r"\textit{This prototype transcript is an informational research proof-of-concept and does not constitute a legally binding administrative decision by Elmergib University.}",
-        r"\vspace{1em}",
-        r"\section*{Dialogue Record}"
-    ]
-    for msg in messages:
-        role = "Student Query" if msg["role"] == "user" else "Elmergib Regulatory AI"
-        safe_content = (
-            msg["content"]
-            .replace("\\", "\\textbackslash ")
-            .replace("_", "\\_")
-            .replace("%", "\\%")
-            .replace("$", "\\$")
-            .replace("#", "\\#")
-            .replace("&", "\\&")
-        )
-        tex.append(rf"\subsection*{{{role}}}")
-        tex.append(f"{safe_content}")
-        tex.append(r"\vspace{0.5em}")
         
-    tex.append(r"\end{document}")
-    return "\n".join(tex)
-
-with col_export:
-    st.write("")  # vertical spacing alignment
-    current_messages = st.session_state.get("messages", [])
-    latex_data = generate_latex_transcript(current_messages)
-    st.download_button(
-        label="📥 Export LaTeX",
-        data=latex_data,
-        file_name="elmergib_academic_transcript.tex",
-        mime="application/x-tex",
-        use_container_width=True
-    )
-
-# ---------------------------------------------------------
-# Chat Session State Initialization
-# ---------------------------------------------------------
-if "messages" not in st.session_state:
-    st.session_state.messages = [
-        {
-            "role": "assistant",
-            "content": (
-                "مرحباً بكم في المساعد الذكي لجامعة المرقب 🏛️\n\n"
-                "أهلاً بكم أعزائي الطلاب وأعضاء الهيئة التدريسية. يُقدم هذا النظام استرجاعاً وتلخيصاً موثقاً لمواد "
-                "**لائحة تنظيم التعليم العالي والامتحانات بالجامعات الليبية (القرار رقم 501 لسنة 2010م)** "
-                "واللوائح الداخلية المعتمدة للكليات.\n\n"
-                "Welcome to the Elmergib University Regulatory Assistant. Feel free to inquire about academic probation, "
-                "grading scales, progression requirements, or leave of absence."
-            ),
-            "response_data": None
-        }
-    ]
-
-# ---------------------------------------------------------
-# Chat Interface: Loop Through Messages
-# ---------------------------------------------------------
-for msg in st.session_state.messages:
-    with st.chat_message(msg["role"]):
-        st.markdown(msg["content"])
-        
-        # Check if assistant response metadata is present
-        resp_data = msg.get("response_data")
-        if resp_data:
-            # Case 1: The "Abstention" Card (out of scope boundary)
-            if resp_data.get("abstained") is True:
-                card_html = f"""
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            if message.get("abstained"):
+                st.markdown("""
                 <div class="abstention-card">
-                    <span class="abstention-badge">ERR_SCOPE_BOUNDARY</span>
-                    <h4>🚫 Scope Boundary: Query Outside Regulation Scope</h4>
-                    <p><strong>Official Limitation:</strong> {resp_data.get('answer', 'Unknown')}</p>
-                    <div class="abstention-referral">
-                        <strong>📌 Recommended Authority:</strong> General University Administration
-                    </div>
+                    <div class="abstention-header">🚫 Scope Boundary</div>
+                    <p><strong>Query Outside Regulation Scope:</strong> The available official documents do not contain rules addressing this inquiry.</p>
                 </div>
-                """
-                st.markdown(card_html, unsafe_allow_html=True)
+                """, unsafe_allow_html=True)
+            else:
+                st.markdown(message["content"])
                 
-            # Case 2: Successful Answer with Citation Expander
-            elif resp_data.get("citation"):
-                cit = resp_data["citation"]
-                with st.expander("📌 View Source Citation", expanded=False):
-                    st.markdown(f"**Document Title:** {cit.get('source_title', 'University Regulations')}")
-                    st.markdown(f"**Source URL:** [{cit.get('source_url', '#')}]({cit.get('source_url', '#')})")
-                    st.markdown(f"**Retrieval Date:** `{cit.get('retrieved_at', datetime.date.today().strftime('%B %d, %Y'))}`")
-                    st.markdown(f'<blockquote class="citation-quote">{cit.get("chunk_text", "")}</blockquote>', unsafe_allow_html=True)
+                if "citation" in message and message["citation"]:
+                    cit = message["citation"]
+                    with st.expander(f"📌 Source Citation"):
+                        st.markdown(f"**Source:** [{cit.get('source_url', 'Unknown')}]({cit.get('source_url', '#')})")
+                        st.markdown(f"**Retrieved At:** `{cit.get('retrieved_at', 'Unknown')}`")
+                        st.markdown(f'<div class="citation-quote">{cit.get("chunk_text", "No source text available.")}</div>', unsafe_allow_html=True)
+                
+    # Chat Input
+    if prompt := st.chat_input("Ask a question about university regulations..."):
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        with st.chat_message("user"):
+            st.markdown(prompt)
+            
+        with st.chat_message("assistant"):
+            with st.spinner("Searching regulations..."):
+                # Call the real RAG pipeline
+                response = answer_question(prompt)
+                
+                if response.get("abstained"):
+                    st.markdown("""
+                    <div class="abstention-card">
+                        <div class="abstention-header">🚫 Scope Boundary</div>
+                        <p><strong>Query Outside Regulation Scope:</strong> The available official documents do not contain rules addressing this inquiry.</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    st.session_state.messages.append({"role": "assistant", "content": "", "abstained": True})
+                else:
+                    st.markdown(response["answer"])
+                    cit = response.get("citation", {})
+                    with st.expander(f"📌 Source Citation"):
+                        st.markdown(f"**Source:** [{cit.get('source_url', 'Unknown')}]({cit.get('source_url', '#')})")
+                        st.markdown(f"**Retrieved At:** `{cit.get('retrieved_at', 'Unknown')}`")
+                        st.markdown(f'<div class="citation-quote">{cit.get("chunk_text", "No source text available.")}</div>', unsafe_allow_html=True)
+                        
+                    st.session_state.messages.append({
+                        "role": "assistant", 
+                        "content": response["answer"],
+                        "citation": cit,
+                        "abstained": False
+                    })
 
-# ---------------------------------------------------------
-# Chat Input & Response Generation Loop
-# ---------------------------------------------------------
-if user_prompt := st.chat_input("Ask about university bylaws, grading scales, graduation requirements... | اسأل عن اللوائح"):
-    # 1. Render user message
-    with st.chat_message("user"):
-        st.markdown(user_prompt)
-    st.session_state.messages.append({
-        "role": "user",
-        "content": user_prompt,
-        "response_data": None
-    })
-    
-    # 2. Compute response from real RAG answer_question()
-    with st.spinner("Analyzing university regulations..."):
-        result = answer_question(user_prompt)
-    
-    # 3. Render AI response
-    with st.chat_message("assistant"):
-        if result.get("abstained") is True:
-            card_html = f"""
-            <div class="abstention-card">
-                <span class="abstention-badge">ERR_SCOPE_BOUNDARY</span>
-                <h4>🚫 Scope Boundary: Query Outside Regulation Scope</h4>
-                <p><strong>Official Limitation:</strong> {result.get('answer', 'Unknown')}</p>
-                <div class="abstention-referral">
-                    <strong>📌 Recommended Authority:</strong> General University Administration
-                </div>
-            </div>
-            """
-            st.markdown(card_html, unsafe_allow_html=True)
-            
-            st.session_state.messages.append({
-                "role": "assistant",
-                "content": "Scope Boundary Error", # Content hidden behind card
-                "response_data": result
-            })
-        else:
-            st.markdown(result["answer"])
-            
-            if result.get("citation"):
-                cit = result["citation"]
-                with st.expander("📌 View Source Citation", expanded=False):
-                    st.markdown(f"**Document Title:** {cit.get('source_title', 'University Regulations')}")
-                    st.markdown(f"**Source URL:** [{cit.get('source_url', '#')}]({cit.get('source_url', '#')})")
-                    st.markdown(f"**Retrieval Date:** `{cit.get('retrieved_at', datetime.date.today().strftime('%B %d, %Y'))}`")
-                    st.markdown(f'<blockquote class="citation-quote">{cit.get("chunk_text", "")}</blockquote>', unsafe_allow_html=True)
-                    
-            st.session_state.messages.append({
-                "role": "assistant",
-                "content": result["answer"],
-                "response_data": result
-            })
+if __name__ == "__main__":
+    main()
