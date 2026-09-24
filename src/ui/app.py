@@ -5,8 +5,12 @@ Domain: src/ui/
 Goal: Deliver a working Streamlit chat interface calling answer_question().
 """
 import streamlit as st
-import random
-import time
+import sys
+import os
+
+# Ensure src is in the python path to import rag pipeline
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+from src.rag.pipeline import answer_question
 
 # --- STYLES INJECTION ---
 CSS = """
@@ -111,32 +115,9 @@ CSS = """
 </style>
 """
 
-# --- BACKEND MOCKING ---
-def answer_question(user_query: str) -> dict:
-    time.sleep(1.2)
-    
-    state_1 = {
-        "answer": "Between 2022 and 2024, investigations into clinical natural language processing have systematically transitioned from prompt-engineered generative foundations to hybrid retrieval-augmented topologies.\n\n### 1. Core Benchmark Findings\nAcross multicenter datasets, current literature indicates that coupling frozen parameter weights with dynamic vector-indexed medical databases substantially mitigates factual drift in diagnostic decision support systems.", 
-        "citation": {
-            "text": "...findings demonstrate a 34% reduction in hallucination rates when combining dense retrieval mechanisms with verified PubMed Central indices...", 
-            "url": "http://elmergib.edu.ly/docs/attendance.pdf", 
-            "date": "2026-09-22",
-            "title": "Journal of Medical Informatics, Vol 48"
-        }, 
-        "abstained": False
-    }
-    
-    state_2 = {
-        "answer": "", 
-        "citation": {}, 
-        "abstained": True
-    }
-    
-    return random.choice([state_1, state_2])
-
 
 def main():
-    st.set_page_config(page_title="Academic Intelligence Assistant", page_icon="🎓", layout="wide")
+    st.set_page_config(page_title="Elmergib Smart Assistant", page_icon="🎓", layout="wide")
     st.markdown(CSS, unsafe_allow_html=True)
     
     # --- SIDEBAR ---
@@ -151,7 +132,6 @@ def main():
         st.markdown("---")
         st.markdown("### ⚙️ Settings")
         
-        # Theme Mockup Toggle
         theme = st.radio("UI Theme", ["System Default", "Light Mode", "Dark Mode"], 
                          help="Note: Native Streamlit theming is fully controlled via the top-right '⋮' Menu -> Settings.")
         
@@ -160,11 +140,10 @@ def main():
 
     # --- MAIN CONTENT ---
     # Top Banner
-    st.warning("**PROTOC-REF #482** | Informational prototype only. Citations must be independently verified for peer-reviewed academic submissions and formal clinical application.", icon="⚠️")
+    st.warning("⚠️ **Disclaimer:** This prototype is an informational research proof-of-concept. It is not an official university decision channel, and outputs should not be treated as formal administrative rulings.", icon="⚠️")
     
-    st.title("Academic Intelligence Assistant")
+    st.title("Elmergib Smart Assistant")
     
-    # Context Header Mockup
     col1, col2 = st.columns([3, 1])
     with col1:
         st.markdown("#### Synthesis Query: RAG in Clinical NLP")
@@ -192,19 +171,20 @@ def main():
                 
                 if "citation" in message and message["citation"]:
                     cit = message["citation"]
-                    with st.expander(f"📌 {cit.get('title', 'Source Citation')}"):
-                        st.markdown(f"**Source:** [{cit.get('url', 'Document')}]({cit.get('url', '#')})")
-                        st.markdown(f"**Retrieved At:** `{cit.get('date', '')}`")
-                        st.markdown(f'<div class="citation-quote">{cit.get("text", "")}</div>', unsafe_allow_html=True)
+                    with st.expander(f"📌 Source Citation"):
+                        st.markdown(f"**Source:** [{cit.get('source_url', 'Unknown')}]({cit.get('source_url', '#')})")
+                        st.markdown(f"**Retrieved At:** `{cit.get('retrieved_at', 'Unknown')}`")
+                        st.markdown(f'<div class="citation-quote">{cit.get("chunk_text", "No source text available.")}</div>', unsafe_allow_html=True)
                 
     # Chat Input
-    if prompt := st.chat_input("Ask a verified academic question, request cross-study meta-analysis, or cite by DOI..."):
+    if prompt := st.chat_input("Ask a question about university regulations..."):
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
             st.markdown(prompt)
             
         with st.chat_message("assistant"):
-            with st.spinner("Searching official regulations..."):
+            with st.spinner("Searching regulations..."):
+                # Call the real RAG pipeline
                 response = answer_question(prompt)
                 
                 if response.get("abstained"):
@@ -218,10 +198,10 @@ def main():
                 else:
                     st.markdown(response["answer"])
                     cit = response.get("citation", {})
-                    with st.expander(f"📌 {cit.get('title', 'Source Citation')}"):
-                        st.markdown(f"**Source:** [{cit.get('url', 'Document')}]({cit.get('url', '#')})")
-                        st.markdown(f"**Retrieved At:** `{cit.get('date', '')}`")
-                        st.markdown(f'<div class="citation-quote">{cit.get("text", "")}</div>', unsafe_allow_html=True)
+                    with st.expander(f"📌 Source Citation"):
+                        st.markdown(f"**Source:** [{cit.get('source_url', 'Unknown')}]({cit.get('source_url', '#')})")
+                        st.markdown(f"**Retrieved At:** `{cit.get('retrieved_at', 'Unknown')}`")
+                        st.markdown(f'<div class="citation-quote">{cit.get("chunk_text", "No source text available.")}</div>', unsafe_allow_html=True)
                         
                     st.session_state.messages.append({
                         "role": "assistant", 
@@ -229,3 +209,6 @@ def main():
                         "citation": cit,
                         "abstained": False
                     })
+
+if __name__ == "__main__":
+    main()
