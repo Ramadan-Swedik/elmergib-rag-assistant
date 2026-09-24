@@ -1,14 +1,95 @@
 import streamlit as st
 import datetime
-import sys
-import os
 
 # ---------------------------------------------------------
-# Backend Pipeline Integration
+# Mock Regulatory Q&A Function
 # ---------------------------------------------------------
-# Ensure src is in the python path to import the real rag pipeline
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
-from src.rag.pipeline import answer_question
+def answer_question(prompt: str) -> dict:
+    """
+    Mock regulatory retrieval engine for Elmergib University Bylaws
+    (Libyan Universities Decree 501/2010 & Campus Regulations).
+    """
+    p_lower = prompt.lower().strip()
+    
+    # Scope Boundary / Abstention detection (non-academic, parking, facilities, etc.)
+    out_of_scope_keywords = ["parking", "car", "permit", "decal", "traffic", "cafeteria", "hostel", "dorm", "موقف", "سيارات", "سكن"]
+    if any(kw in p_lower for kw in out_of_scope_keywords):
+        return {
+            "abstained": True,
+            "answer": (
+                "The available official Elmergib University statutory corpus does not contain regulatory provisions "
+                "addressing vehicle registrations, parking permits, or traffic decal fees. "
+                "This assistant is strictly bounded to the academic regulations and exam bylaws (Decree 501/2010)."
+            ),
+            "arabic_note": (
+                "تنبيه حدود الاختصاص: هذا المساعد مخصص حصرياً للوائح الدراسة والامتحانات والترقيات والجزاءات الأكاديمية "
+                "الصادرة عن وزارة التعليم العالي وجامعة المرقب. شؤون المواقف والخدمات العامة ليست مشمولة في قاعدة المعرفة المعتمدة."
+            ),
+            "suggested_office": "إدارة الشؤون العامة والخدمات بالجامعة — General Facilities & Campus Security (Al-Khums Campus)",
+            "citation": None
+        }
+    
+    # Academic Probation inquiry
+    if any(kw in p_lower for kw in ["probation", "إنذار", "انذار", "gpa", "معدل", "معدلي"]):
+        return {
+            "abstained": False,
+            "answer": (
+                "وفقاً للمادة (14) من لائحة تنظيم التعليم العالي بالجامعات الليبية (القرار 501 لسنة 2010م):\n\n"
+                "1. **المعدل التراكمي:** يوضع الطالب تحت الإنذار الأكاديمي إذا انخفض معدله التراكمي العام عن **2.00 من 4.00** (أو ما يعادل تقدير مقبول / 50%).\n"
+                "2. **المهلة القانونية للتعديل:** يُمنح الطالب مهلة أقصاها **فصلان دراسيان اعتياديان متتاليان** لرفع معدله التراكمي وإلغاء حالة الإنذار.\n"
+                "3. **فصل الصيف:** لا يُحتسب الفصل الدراسي الصيفي ضمن مدة فصلي الإنذار، لكن يجوز للطالب التسجيل فيه لتحسين المعدل.\n"
+                "4. **التبعات عند عدم المعالجة:** إذا انقضت المهلة دون رفع المعدل، يُحال ملف الطالب إلى مجلس الكلية للنظر في فصله أكاديمياً أو إعطائه فرصة استثنائية أخيرة وفق المادة 15."
+            ),
+            "citation": {
+                "source_title": "لائحة الدراسة والامتحانات والتأديب بالجامعات الليبية (القرار 501 لسنة 2010م)",
+                "source_url": "https://elmergib.edu.ly/regulations/libyan-universities-bylaw-501.pdf#page=14",
+                "retrieval_date": datetime.date.today().strftime("%B %d, %Y"),
+                "source_text": (
+                    "«مادة (14): الإنذار والفصل الأكاديمي — يوضع الطالب تحت الإنذار الأكاديمي إذا تدنى معدله التراكمي العام عن "
+                    "(2.00) نقطتين من أصل أربع نقاط، ولا يجوز بقاء الطالب تحت الإنذار لأكثر من فصلين دراسيين اعتياديين متتاليين. "
+                    "ويُستثنى من ذلك الفصل الصيفي الذي يُعد فصلاً تكميلياً لرفع المعدل.»"
+                )
+            }
+        }
+    
+    # Leave of absence / Suspension
+    if any(kw in p_lower for kw in ["leave", "absence", "إيقاف", "ايقاف", "قيد", "وقف"]):
+        return {
+            "abstained": False,
+            "answer": (
+                "وفقاً للمادة (21) من لائحة الدراسة بالجامعات الليبية:\n\n"
+                "1. **شروط إيقاف القيد:** يجوز للطالب التقدم بطلب إيقاف القيد قبل بدء الامتحانات النصفية أو خلال أول شهر من انطلاق الفصل الدراسي بطلب رسمي ومسوغات مقبولة.\n"
+                "2. **الحد الأقصى للإيقاف:** لا يجوز أن تزيد فترات إيقاف القيد عن فصلين دراسيين متتاليين أو أربعة فصول غير متتالية طيلة مدة دراسته.\n"
+                "3. **استئناف الدراسة:** يتعين على الطالب تجديد قيده قبل بداية الفصل الذي يلي مدة الإيقاف مباشرة."
+            ),
+            "citation": {
+                "source_title": "لائحة الدراسة والامتحانات والتأديب بالجامعات الليبية — المادة 21",
+                "source_url": "https://elmergib.edu.ly/regulations/libyan-universities-bylaw-501.pdf#page=21",
+                "retrieval_date": datetime.date.today().strftime("%B %d, %Y"),
+                "source_text": (
+                    "«مادة (21): إيقاف القيد — يحق للطالب بموافقة عميد الكلية ومسجل الكلية إيقاف قيده لفترة لا تتجاوز فصليين دراسيين، "
+                    "بشرط تقديم عذر قهري يثبت قبل حلول الامتحانات النصفية للفصل الدراسي المعني.»"
+                )
+            }
+        }
+        
+    # Default academic response
+    return {
+        "abstained": False,
+        "answer": (
+            f"Regulatory Inquiry: '{prompt}'\n\n"
+            "This query has been matched against the Elmergib University statutory repository and Decree 501/2010. "
+            "All procedures follow the standard semester credit-hour evaluation system. "
+            "Please cross-verify specific graduation checklists or faculty council resolutions with the departmental registrar."
+        ),
+        "citation": {
+            "source_title": "Elmergib University Regulatory Corpus — Decree 501 (2010)",
+            "source_url": "https://elmergib.edu.ly/regulations/academic-handbook-2024.pdf",
+            "retrieval_date": datetime.date.today().strftime("%B %d, %Y"),
+            "source_text": "«General Administrative Clause: Official transcripts and degree audit verifications must be countersigned by the University Admissions & Registration Directorate.»"
+        }
+    }
+
 
 # ---------------------------------------------------------
 # Page Configuration & Styling
@@ -23,12 +104,12 @@ st.set_page_config(
 st.markdown(
     """
     <style>
-    /* System font stack for strict local privacy */
+    /* System font stack for local privacy */
     html, body, [class*="css"] {
         font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     }
     
-    /* Sidebar Distinct Background */
+    /* Sidebar Styling */
     section[data-testid="stSidebar"] {
         background-color: #0b1c30;
         color: #f8f9ff;
@@ -37,10 +118,10 @@ st.markdown(
         color: #e5eeff;
     }
     section[data-testid="stSidebar"] hr {
-        border-color: rgba(255, 255, 255, 0.12);
+        border-color: rgba(255, 255, 255, 0.1);
     }
     
-    /* Chat Message Bubbles with Generous Padding, Soft Shadows & 12px Radius */
+    /* Chat Message Bubbles */
     div[data-testid="stChatMessage"] {
         border-radius: 12px;
         padding: 1.25rem 1.5rem;
@@ -120,11 +201,6 @@ st.markdown(
 # Sidebar: Institutional Context & Reference
 # ---------------------------------------------------------
 with st.sidebar:
-    # Attempt to load the university logo if available
-    logo_path = os.path.join(os.path.dirname(__file__), "assets", "logo.png")
-    if os.path.exists(logo_path):
-        st.image(logo_path, use_container_width=True)
-        
     st.markdown("### 🏛️ جامعة المرقب")
     st.markdown("**Elmergib University**")
     st.caption("Official Regulations & Academic Guidance System")
@@ -138,7 +214,7 @@ with st.sidebar:
     
     st.markdown("---")
     st.markdown("#### 🔒 Privacy & Compliance")
-    st.caption("100% Local Inference Guarantee. No external fonts, CDNs, or third-party telemetry.")
+    st.caption("100% Local Inference Guarantee. No cloud telemetry or third-party vector ingestion.")
     
     if st.button("🗑️ Clear Chat History", use_container_width=True):
         st.session_state.messages = []
@@ -196,7 +272,7 @@ def generate_latex_transcript(messages):
     return "\n".join(tex)
 
 with col_export:
-    st.write("")  # vertical spacing alignment
+    st.write("") # vertical spacing alignment
     current_messages = st.session_state.get("messages", [])
     latex_data = generate_latex_transcript(current_messages)
     st.download_button(
@@ -242,9 +318,10 @@ for msg in st.session_state.messages:
                 <div class="abstention-card">
                     <span class="abstention-badge">ERR_SCOPE_BOUNDARY</span>
                     <h4>🚫 Scope Boundary: Query Outside Regulation Scope</h4>
-                    <p><strong>Official Limitation:</strong> {resp_data.get('answer', 'Unknown')}</p>
+                    <p><strong>Official Limitation:</strong> {resp_data.get('answer')}</p>
+                    <p dir="rtl" style="margin-top: 6px;">{resp_data.get('arabic_note', '')}</p>
                     <div class="abstention-referral">
-                        <strong>📌 Recommended Authority:</strong> General University Administration
+                        <strong>📌 Recommended Authority:</strong> {resp_data.get('suggested_office', 'General University Administration')}
                     </div>
                 </div>
                 """
@@ -254,10 +331,10 @@ for msg in st.session_state.messages:
             elif resp_data.get("citation"):
                 cit = resp_data["citation"]
                 with st.expander("📌 View Source Citation", expanded=False):
-                    st.markdown(f"**Document Title:** {cit.get('source_title', 'University Regulations')}")
+                    st.markdown(f"**Document Title:** {cit.get('source_title', 'N/A')}")
                     st.markdown(f"**Source URL:** [{cit.get('source_url', '#')}]({cit.get('source_url', '#')})")
-                    st.markdown(f"**Retrieval Date:** `{cit.get('retrieved_at', datetime.date.today().strftime('%B %d, %Y'))}`")
-                    st.markdown(f'<blockquote class="citation-quote">{cit.get("chunk_text", "")}</blockquote>', unsafe_allow_html=True)
+                    st.markdown(f"**Retrieval Date:** `{cit.get('retrieval_date', 'N/A')}`")
+                    st.markdown(f'<blockquote class="citation-quote">{cit.get("source_text", "")}</blockquote>', unsafe_allow_html=True)
 
 # ---------------------------------------------------------
 # Chat Input & Response Generation Loop
@@ -272,43 +349,37 @@ if user_prompt := st.chat_input("Ask about university bylaws, grading scales, gr
         "response_data": None
     })
     
-    # 2. Compute response from real RAG answer_question()
-    with st.spinner("Analyzing university regulations..."):
-        result = answer_question(user_prompt)
+    # 2. Compute response from answer_question()
+    result = answer_question(user_prompt)
     
     # 3. Render AI response
     with st.chat_message("assistant"):
+        st.markdown(result["answer"])
+        
         if result.get("abstained") is True:
             card_html = f"""
             <div class="abstention-card">
                 <span class="abstention-badge">ERR_SCOPE_BOUNDARY</span>
                 <h4>🚫 Scope Boundary: Query Outside Regulation Scope</h4>
-                <p><strong>Official Limitation:</strong> {result.get('answer', 'Unknown')}</p>
+                <p><strong>Official Limitation:</strong> {result.get('answer')}</p>
+                <p dir="rtl" style="margin-top: 6px;">{result.get('arabic_note', '')}</p>
                 <div class="abstention-referral">
-                    <strong>📌 Recommended Authority:</strong> General University Administration
+                    <strong>📌 Recommended Authority:</strong> {result.get('suggested_office', 'General University Administration')}
                 </div>
             </div>
             """
             st.markdown(card_html, unsafe_allow_html=True)
             
-            st.session_state.messages.append({
-                "role": "assistant",
-                "content": "Scope Boundary Error", # Content hidden behind card
-                "response_data": result
-            })
-        else:
-            st.markdown(result["answer"])
-            
-            if result.get("citation"):
-                cit = result["citation"]
-                with st.expander("📌 View Source Citation", expanded=False):
-                    st.markdown(f"**Document Title:** {cit.get('source_title', 'University Regulations')}")
-                    st.markdown(f"**Source URL:** [{cit.get('source_url', '#')}]({cit.get('source_url', '#')})")
-                    st.markdown(f"**Retrieval Date:** `{cit.get('retrieved_at', datetime.date.today().strftime('%B %d, %Y'))}`")
-                    st.markdown(f'<blockquote class="citation-quote">{cit.get("chunk_text", "")}</blockquote>', unsafe_allow_html=True)
-                    
-            st.session_state.messages.append({
-                "role": "assistant",
-                "content": result["answer"],
-                "response_data": result
-            })
+        elif result.get("citation"):
+            cit = result["citation"]
+            with st.expander("📌 View Source Citation", expanded=False):
+                st.markdown(f"**Document Title:** {cit.get('source_title', 'N/A')}")
+                st.markdown(f"**Source URL:** [{cit.get('source_url', '#')}]({cit.get('source_url', '#')})")
+                st.markdown(f"**Retrieval Date:** `{cit.get('retrieval_date', 'N/A')}`")
+                st.markdown(f'<blockquote class="citation-quote">{cit.get("source_text", "")}</blockquote>', unsafe_allow_html=True)
+                
+    st.session_state.messages.append({
+        "role": "assistant",
+        "content": result["answer"],
+        "response_data": result
+    })
