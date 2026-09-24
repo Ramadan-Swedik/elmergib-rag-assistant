@@ -1,0 +1,6 @@
+{
+  "name": "Elmergib Smart Assistant 🎓",
+  "description": "Official Academic Regulations & Bylaws Information System for Elmergib University with grounded Decree 501 citations and scope boundary guards.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
