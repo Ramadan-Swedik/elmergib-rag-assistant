@@ -1,5 +1,7 @@
 # 🎓 Smart Assistant for Elmergib University Students (PoC)
 
+[![CI Checks](https://github.com/Ramadan-Swedik/elmergib-rag-assistant/actions/workflows/ci.yml/badge.svg)](https://github.com/Ramadan-Swedik/elmergib-rag-assistant/actions/workflows/ci.yml)
+
 An open-source, local Retrieval-Augmented Generation (RAG) assistant designed to help Elmergib University students quickly search and verify attendance and absence regulations. 
 
 > **Disclaimer:** This prototype is an informational research proof-of-concept developed for the Samsung Innovation Campus AI Course. It is not an official university decision channel, and outputs should not be treated as formal administrative rulings.
@@ -31,6 +33,7 @@ To eliminate speculative outputs, the system incorporates an **Abstention Gate**
 
 ## 📂 Repository Structure
 ```text
+├── .github/               # CI/CD Workflows (GitHub Actions)
 ├── data/                  # Official public university PDFs and clean extracts
 ├── eval/                  # Test question sets and RAGAS scripts
 ├── src/
