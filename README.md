@@ -18,7 +18,7 @@ To eliminate speculative outputs, the system incorporates an **Abstention Gate**
 * **Embedding & Indexing:** Dense embeddings via `BAAI/bge-m3` stored in `ChromaDB`, paired with a Sparse `BM25` index.
 * **Retrieval Pipeline:** Hybrid search combined via Reciprocal Rank Fusion (RRF) and re-ranked using `bge-reranker-v2-m3`.
 * **Inference:** Local LLM execution via `Ollama` running `Qwen2.5:7B` (or `Llama 3`).
-* **Interface:** Interactive chat interface built with `Streamlit`.
+* **Interface:** Interactive chat interface built with `React` (Vite), `Tailwind CSS`, and `FastAPI`. Features dynamic Light/Dark modes and a responsive Sidebar.
 * **Evaluation:** RAGAS framework benchmarking Faithfulness, Answer Relevancy, Citation Correctness, and Latency.
 
 ---
@@ -27,6 +27,7 @@ To eliminate speculative outputs, the system incorporates an **Abstention Gate**
 * **Hybrid Search with Re-Ranking:** Blends keyword accuracy with semantic retrieval to locate specific regulatory clauses.
 * **Grounded Citations:** Every answer displays the exact retrieved context snippet, source document link, and retrieval timestamp.
 * **Abstention Logic:** Built-in safeguards reject out-of-scope prompts and prompt-injection attempts.
+* **Multilingual (Arabic & English):** Instant dynamic UI localization and on-the-fly system directives that instruct the LLM to reply in the user's selected language.
 * **100% Local & Private:** Runs entirely on-device via Ollama, collecting zero student personal data.
 
 ---
@@ -39,7 +40,7 @@ To eliminate speculative outputs, the system incorporates an **Abstention Gate**
 ├── src/
 │   ├── database/          # Ingestion, chunking, ChromaDB & BM25 indexing
 │   ├── rag/               # Hybrid retrieval, Ollama client, abstention logic
-│   └── ui/                # Streamlit web application and citation renderers
+│   └── ui/                # React web application, FastAPI server, and citation renderers
 ├── team tasks/            # Individual workflow guides and role documentation
 ├── .env.example
 ├── .gitignore
