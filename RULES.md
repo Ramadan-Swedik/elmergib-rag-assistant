@@ -8,7 +8,7 @@ To deliver a stable Proof-of-Concept within our 14-day sprint, all team members 
 ---
 ## 2. Branch Naming Standards
 Create your branch from an updated `main` branch using these prefixes:
-* `feature/[name]/[short-description]` (e.g., `feature/ramadan/streamlit-citation-ui`)
+* `feature/[name]/[short-description]` (e.g., `feature/ramadan/react-citation-ui`)
 * `data/[name]/[short-description]` (e.g., `data/mohammed/pypdf-chunking-pipeline`)
 * `eval/[name]/[short-description]` (e.g., `eval/qa/ragas-benchmark-suite`)
 * `fix/[name]/[short-description]` (e.g., `fix/backend/rrf-fusion-score-fix`)

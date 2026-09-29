@@ -26,7 +26,7 @@ signature) must be agreed by both owners before committing, per `RULES.md` §5.
 |---|---|
 | `src/database/` | `pypdf`, `sentence-transformers`/`FlagEmbedding` (`BAAI/bge-m3`), `ChromaDB`, `rank_bm25` |
 | `src/rag/` | `Ollama` (`Qwen2.5:7b`, fallback `llama3.1:8b`), `BAAI/bge-reranker-v2-m3`, Reciprocal Rank Fusion (custom) |
-| `src/ui/` | `Streamlit` |
+| `src/ui/` | `React` (Vite, Tailwind CSS), `FastAPI` (Backend) |
 | `eval/` | `ragas`, `pandas`, custom deterministic metrics (Recall@3, Abstention P/R, Latency) |
 
 All models are open-source; no paid API keys required.
@@ -69,18 +69,18 @@ All models are open-source; no paid API keys required.
 ---
 
 ### 👤 Ramadan — `src/ui/`
-**Goal:** Deliver a working Streamlit chat interface calling `answer_question()`.
+**Goal:** Deliver a working React chat interface and FastAPI backend calling `answer_question()`.
 
 | Day | Task |
 |---|---|
 | 1-8 | Coordinate the team (branch reviews, PR approvals, unblocking dependencies) while designing the UI mockup/wireframe. |
-| 9 | Once Amymah's `answer_question()` has a first working stub, build the Streamlit chat UI against it. |
+| 9 | Once Amymah's `answer_question()` has a first working stub, build the React chat UI and FastAPI backend against it. |
 | 10 | Display full citation (chunk text + source URL + retrieval date) — not just the answer. Add the required disclaimer: *"Informational prototype only — not an official University decision channel."* |
 | 11 | Visually distinguish abstention responses from normal answers. |
 | 12-13 | Polish UI, test with real users (team members), fix UX issues. |
 | 14 | Support final presentation prep. |
 
-**Output:** `src/ui/app.py` (Streamlit), screenshots/demo recording for the final presentation.
+**Output:** `src/ui/frontend/` (React), `src/ui/server.py` (FastAPI), screenshots/demo recording for the final presentation.
 
 ---
 
@@ -120,6 +120,6 @@ wait silently.
 
 ## 5. Expected Outcomes (Day 14)
 
-- A working end-to-end prototype: Streamlit UI → `answer_question()` → grounded answer with citation, or explicit abstention.
+- A working end-to-end prototype: React UI → FastAPI → `answer_question()` → grounded answer with citation, or explicit abstention.
 - `eval/results.csv` with deterministic + RAGAS metrics, covering all 5 question categories.
 - A final report documenting the architecture, experiments (e.g. Naive vs. Hybrid retrieval comparison if time permits), and all known limitations — written honestly rather than overclaiming.
