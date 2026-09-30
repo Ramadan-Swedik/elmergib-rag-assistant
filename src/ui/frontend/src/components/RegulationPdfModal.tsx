@@ -17,7 +17,6 @@ export const RegulationPdfModal: React.FC<RegulationPdfModalProps> = ({
   onShowToast,
 }) => {
   const [zoom, setZoom] = useState<number>(100);
-  const [page, setPage] = useState<number>(21);
 
   if (!isOpen || !citation) return null;
 
@@ -49,7 +48,7 @@ export const RegulationPdfModal: React.FC<RegulationPdfModalProps> = ({
                 {citation.documentTitle}
               </h3>
               <p className="text-[11px] text-slate-400 font-mono">
-                Elmergib_University_Regulations_Decree501.pdf • Page {page} of 68
+                Elmergib_University_Regulations.pdf • Page {citation.pdfPage} of 68
               </p>
             </div>
           </div>
@@ -117,11 +116,12 @@ export const RegulationPdfModal: React.FC<RegulationPdfModalProps> = ({
           </div>
         </div>
 
-        {/* PDF Page Canvas Body */}
         <div className="flex-1 overflow-y-auto p-4 md:p-8 flex justify-center bg-slate-900/40">
           <div 
             style={{ transform: `scale(${zoom / 100})`, transformOrigin: 'top center' }}
-            className="w-full max-w-2xl bg-white text-slate-900 rounded-sm shadow-xl p-8 md:p-12 space-y-6 font-arabic border border-slate-300 transition-transform"
+            className={`w-full max-w-2xl rounded-sm shadow-xl p-8 md:p-12 space-y-6 font-arabic border transition-transform ${
+              isDarkMode ? 'bg-[#162137] text-slate-300 border-[#2a3c5a]' : 'bg-white text-slate-900 border-slate-300'
+            }`}
             dir="rtl"
           >
             {/* University Letterhead */}
@@ -156,44 +156,25 @@ export const RegulationPdfModal: React.FC<RegulationPdfModalProps> = ({
               </p>
             </div>
 
-            {/* Highlighted Article 21 */}
-            <div className="bg-amber-50/70 border-r-4 border-amber-500 p-4 rounded-xs space-y-2">
-              <div className="flex items-center justify-between">
-                <h4 className="font-bold text-blue-950 text-sm flex items-center gap-2">
-                  <span className="px-2 py-0.5 rounded bg-blue-900 text-white text-xs">المادة (21)</span>
-                  <span>إيقاف القيد الفصلي والسنوي للطالب</span>
+            {/* Extracted Regulation Content */}
+            <div className={`p-6 rounded-lg space-y-4 ${
+              isDarkMode ? 'bg-[#0f172a]/50 border border-[#2a3c5a]' : 'bg-slate-50 border border-slate-200'
+            }`}>
+              <div className="flex items-center justify-between border-b pb-3 mb-3 border-slate-200/20">
+                <h4 className={`font-bold text-sm flex items-center gap-2 ${isDarkMode ? 'text-blue-300' : 'text-blue-900'}`}>
+                  <span className="px-2 py-0.5 rounded bg-blue-600 text-white text-xs">
+                    {citation.articleReference || `Page ${citation.pdfPage}`}
+                  </span>
+                  <span>المرجع الموثق</span>
                 </h4>
-                <span className="text-[11px] text-amber-700 font-sans font-semibold">مقتبس ومعتمد</span>
+                <span className={`text-[11px] font-sans font-semibold ${isDarkMode ? 'text-emerald-400' : 'text-emerald-700'}`}>
+                  مقتبس ومعتمد
+                </span>
               </div>
-              <p className="text-xs md:text-sm text-slate-800 leading-relaxed">
+              
+              <p className={`text-sm md:text-base leading-loose whitespace-pre-wrap ${isDarkMode ? 'text-slate-300' : 'text-slate-800'}`}>
                 {citation.excerpt}
               </p>
-              <div className="text-xs text-slate-700 space-y-1.5 pt-2">
-                <p className="font-semibold text-slate-900">الضوابط التنفيذية للمادة:</p>
-                <ul className="list-decimal list-inside space-y-1 pr-2 text-xs">
-                  <li>يقدم طلب إيقاف القيد مستوفياً لنموذج وقف القيد المعتمد من مكتب المسجل العام للكلية.</li>
-                  <li>الميعاد الأقصى لقبول طلبات إيقاف القيد هو نهاية الأسبوع الرابع من تاريخ انطلاق المحاضرات الفعلية.</li>
-                  <li>لا يجوز إيقاف القيد للطالب المستجد في فصله الدراسي الأول إلا بقرار استثنائي من مجلس الكلية.</li>
-                  <li>الحد الأقصى المسموح به لوقف القيد هو فصلان دراسيان متصلان أو ثلاثة فصول غير متصلة طيلة مدة الدراسة.</li>
-                </ul>
-              </div>
-            </div>
-
-            {/* Related Articles Excerpts */}
-            <div className="space-y-4 pt-2 text-xs text-slate-700 border-t border-slate-200">
-              <div>
-                <h5 className="font-bold text-slate-900 mb-1">المادة (22): إعادة القيد بعد انتهاء فترة الإيقاف</h5>
-                <p className="leading-relaxed">
-                  يلتزم الطالب بمباشرة إجراءات تجديد القيد والتسجيل مع بداية الفصل الدراسي التالي لانتهاء فترة الوقف، ويعد متخلفاً عن الدراسة ويفصل في حال عدم المباشرة دون عذر رسمي تقبله الكلية.
-                </p>
-              </div>
-
-              <div>
-                <h5 className="font-bold text-slate-900 mb-1">المادة (23): الأعذار القهرية والتقارير الطبية</h5>
-                <p className="leading-relaxed">
-                  تخضع جميع التقارير والشهادات الطبية للمصادقة من قِبل اللجنة الطبية بجامعة المرقب، ولا يُعتد بأي إفادة غير موثقة من المركز الصحي الجامعي.
-                </p>
-              </div>
             </div>
 
             {/* Official Stamp & Signatures */}
