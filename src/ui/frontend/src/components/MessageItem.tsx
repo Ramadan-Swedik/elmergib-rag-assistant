@@ -225,7 +225,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({
                       {message.citation.articleReference || 'Article Reference'}
                     </span>
                     <span className={`text-[10px] italic ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
-                      {message.citation.chunkLabel || 'Placeholder chunk'}
+                      {message.citation.chunkLabel || 'Retrieved context'}
                     </span>
                   </div>
                   <div className={`pr-28 font-arabic leading-relaxed ${

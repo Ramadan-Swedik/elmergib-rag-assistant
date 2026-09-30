@@ -125,8 +125,8 @@ export const RegulationPdfModal: React.FC<RegulationPdfModalProps> = ({
             dir="rtl"
           >
             {/* University Letterhead */}
-            <div className="border-b-2 border-slate-900 pb-4 flex items-center justify-between text-center">
-              <div className="text-right text-xs space-y-0.5 font-semibold text-slate-800">
+            <div className={`border-b-2 pb-4 flex items-center justify-between text-center ${isDarkMode ? 'border-slate-600' : 'border-slate-900'}`}>
+              <div className={`text-right text-xs space-y-0.5 font-semibold ${isDarkMode ? 'text-slate-300' : 'text-slate-800'}`}>
                 <p>دولة ليبيا</p>
                 <p>وزارة التعليم العالي والبحث العلمي</p>
                 <p className="text-blue-900 font-bold">جامعة المرقب - الخمس</p>
@@ -148,10 +148,10 @@ export const RegulationPdfModal: React.FC<RegulationPdfModalProps> = ({
 
             {/* Decree Header */}
             <div className="text-center space-y-1">
-              <h2 className="text-base md:text-lg font-bold text-slate-950">
+              <h2 className={`text-base md:text-lg font-bold ${isDarkMode ? 'text-white' : 'text-slate-950'}`}>
                 لائحة تنظيم شؤون التعليم العالي والدراسة والامتحانات
               </h2>
-              <p className="text-xs text-slate-600 font-medium">
+              <p className={`text-xs font-medium ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
                 الباب الثالث: التسجيل والتحويل ووقف القيد الأكاديمي
               </p>
             </div>
@@ -178,10 +178,10 @@ export const RegulationPdfModal: React.FC<RegulationPdfModalProps> = ({
             </div>
 
             {/* Official Stamp & Signatures */}
-            <div className="pt-8 border-t border-slate-300 flex items-center justify-between text-xs text-slate-800">
+            <div className={`pt-8 border-t flex items-center justify-between text-xs ${isDarkMode ? 'border-slate-600 text-slate-300' : 'border-slate-300 text-slate-800'}`}>
               <div className="text-center space-y-8">
                 <p className="font-bold">مسجل عام جامعة المرقب</p>
-                <p className="text-slate-500 font-serif italic text-sm">أ.د. عبدالسلام الفرجاني</p>
+                <p className={`font-serif italic text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>أ.د. عبدالسلام الفرجاني</p>
               </div>
 
               <div className="w-24 h-24 border-2 border-red-700/60 rounded-full flex flex-col items-center justify-center p-2 text-center text-red-800 rotate-[-12deg] select-none">
@@ -193,7 +193,7 @@ export const RegulationPdfModal: React.FC<RegulationPdfModalProps> = ({
 
               <div className="text-center space-y-8">
                 <p className="font-bold">رئيس جامعة المرقب</p>
-                <p className="text-slate-500 font-serif italic text-sm">أ.د. عمران القيب</p>
+                <p className={`font-serif italic text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>أ.د. عمران القيب</p>
               </div>
             </div>
           </div>
