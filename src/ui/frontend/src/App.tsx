@@ -206,7 +206,7 @@ export default function App() {
       // Append instruction to force language in backend
       const promptPayload = language === 'en' 
         ? text + '\n\n[System directive: The user has requested English. You MUST respond entirely in English, no Arabic.]'
-        : text;
+        : text + '\n\n[System directive: The user has requested Arabic. You MUST respond entirely in Arabic, no English.]';
 
       const response = await fetch('http://localhost:8000/api/chat', {
         method: 'POST',
