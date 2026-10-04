@@ -82,6 +82,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
           onKeyDown={handleKeyDown}
+          dir={inputText ? (/[\u0600-\u06FF]/.test(inputText) ? 'rtl' : 'ltr') : (language === 'ar' ? 'rtl' : 'ltr')}
           placeholder={language === 'ar' ? 'اسأل عن اللوائح الدراسية، سلم الدرجات، وشروط التخرج...' : 'Ask about university bylaws, grading scales, graduation requirements...'}
           className={`w-full bg-transparent border-0 text-xs md:text-sm placeholder-slate-400 focus:ring-0 focus:outline-none py-3 ${
             isDarkMode ? 'text-slate-200' : 'text-slate-900'

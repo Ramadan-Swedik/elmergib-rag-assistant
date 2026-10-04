@@ -97,14 +97,14 @@ export const INITIAL_MESSAGES: Message[] = [
       'يجب تقديم عذر رسمي معتمد تقبله الكلية المختصة ومسجل الكلية.',
       'لا تحسب فترة الإيقاف المعتمدة ضمن المدة القانونية القصوى المقررة للحصول على الدرجة الجامعية.'
     ],
-    subNote: '.This is a placeholder answer',
+    subNote: 'تنبيه: هذه إجابة استرشادية مبنية على لوائح الجامعة',
     verifiedSource: true,
     citation: {
       documentTitle: 'University Regulations / لائحة تنظيم شؤون التعليم العالي والجامعات',
       documentTitleEn: 'University Regulations / Higher Education & University Affairs Bylaw',
       retrievalDate: '2023-01-01',
-      articleReference: 'Article Reference',
-      chunkLabel: 'Placeholder chunk',
+      articleReference: 'المادة 21',
+      chunkLabel: 'النص الأصلي للائحة',
       excerpt: '"المادة (21): يحق للطالب وقف قيده لفصل دراسي واحد بقرار من عميد الكلية بناءً على طلب مبرر يقدمه الطالب خلال المدة المحددة..."',
       sourceUrl: 'http://example.com/doc',
       pdfPage: 21,

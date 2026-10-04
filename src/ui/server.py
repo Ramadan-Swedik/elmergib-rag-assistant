@@ -23,16 +23,39 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.on_event("startup")
+async def startup_event():
+    print("Warming up RAG indices and vectorstore in RAM...")
+    try:
+        from src.rag.pipeline import _get_dense_index
+        _get_dense_index()
+        print("RAG models warmed up and ready in RAM!")
+    except Exception as e:
+        print(f"Startup warm-up notice: {e}")
+
 # Define request body model
 class ChatRequest(BaseModel):
     prompt: str
+    language: str | None = None
 
 # Define POST endpoint that connects to our existing Python logic
 @app.post("/api/chat")
 async def chat_endpoint(request: ChatRequest):
-    # This calls your exact Python RAG backend logic!
-    result = answer_question(request.prompt)
-    return result
+    try:
+        result = answer_question(request.prompt, language=request.language)
+        return result
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        print(f"Chat endpoint error: {e}")
+        return {
+            "answer": "عذراً، حدث خطأ أثناء معالجة الاستفسار.",
+            "citation": None,
+            "abstained": True,
+            "abstain_reason": str(e),
+            "confidence": 0.0,
+            "latency": 0.0,
+        }
 
 # Serve the static HTML frontend
 # This points to the folder where we will put your gorgeous AI Studio HTML

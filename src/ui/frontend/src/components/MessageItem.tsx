@@ -80,6 +80,8 @@ export const MessageItem: React.FC<MessageItemProps> = ({
   }
 
   // Assistant Response
+  const isAssistantAr = isRtl(message.content);
+
   return (
     <article className="max-w-4xl mx-auto flex items-start gap-3" data-purpose="assistant-response">
       {/* Assistant Avatar */}
@@ -98,16 +100,16 @@ export const MessageItem: React.FC<MessageItemProps> = ({
         {/* Assistant Sub-header */}
         <div className="flex items-center justify-between text-xs">
           <div className="flex items-center gap-2">
-            <span className={`font-semibold text-xs ${isDarkMode ? 'text-slate-200' : 'text-[#0b1c30]'}`}>
-              {language === 'ar' ? 'المساعد التنظيمي الذكي' : 'Elmergib Regulatory AI'}
+            <span className={`font-semibold text-xs ${isAssistantAr ? 'font-arabic' : 'font-sans'} ${isDarkMode ? 'text-slate-200' : 'text-[#0b1c30]'}`}>
+              {isAssistantAr ? 'المساعد التنظيمي الذكي' : 'Elmergib Regulatory AI'}
             </span>
             {message.verifiedSource && (
-              <span className={`font-arabic text-[11px] px-2 py-0.5 rounded-full border font-medium ${
+              <span className={`text-[11px] px-2 py-0.5 rounded-full border font-medium ${isAssistantAr ? 'font-arabic' : 'font-sans'} ${
                 isDarkMode 
                   ? 'text-emerald-400 bg-emerald-950/50 border-emerald-700/40' 
                   : 'text-emerald-800 bg-emerald-50 border-emerald-300'
               }`}>
-                {language === 'ar' ? 'مستند رسمي معتمد' : 'Verified Official Document'}
+                {isAssistantAr ? 'مستند رسمي معتمد' : 'Verified Official Document'}
               </span>
             )}
           </div>
@@ -122,14 +124,14 @@ export const MessageItem: React.FC<MessageItemProps> = ({
             ? 'bg-[#101b30] border-[#1e2e4f] text-slate-200' 
             : 'bg-white border-[#e2e8f0] text-slate-800 shadow-2xs'
         }`}>
-          <p className={`font-arabic ${isDarkMode ? 'text-slate-100' : 'text-slate-900'} font-medium`} dir="rtl">
+          <p className={`${isAssistantAr ? 'font-arabic text-right' : 'font-sans text-left'} ${isDarkMode ? 'text-slate-100' : 'text-slate-900'} font-medium`} dir={isAssistantAr ? 'rtl' : 'ltr'}>
             {message.content}
           </p>
 
           {message.bulletPoints && message.bulletPoints.length > 0 && (
-            <ul className={`list-disc list-inside space-y-1 font-arabic text-xs pr-1 ${
+            <ul className={`list-disc list-inside space-y-1 text-xs ${isAssistantAr ? 'font-arabic pr-1 text-right' : 'font-sans pl-1 text-left'} ${
               isDarkMode ? 'text-slate-300' : 'text-slate-700'
-            }`} dir="rtl">
+            }`} dir={isAssistantAr ? 'rtl' : 'ltr'}>
               {message.bulletPoints.map((point, index) => (
                 <li key={index} className="leading-relaxed">
                   {point}
@@ -139,7 +141,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({
           )}
 
           {message.subNote && (
-            <p className={`text-xs pt-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+            <p className={`text-xs pt-1 ${isAssistantAr ? 'font-arabic text-right' : 'font-sans text-left'} ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`} dir={isAssistantAr ? 'rtl' : 'ltr'}>
               {message.subNote}
             </p>
           )}
@@ -164,8 +166,8 @@ export const MessageItem: React.FC<MessageItemProps> = ({
               <div className="flex items-center gap-2 text-xs font-semibold">
                 <span className="select-none">📖</span>
                 <span className="select-none">📌</span>
-                <span className={`font-arabic ${isDarkMode ? 'text-blue-200' : 'text-[#00236f]'}`}>
-                  {language === 'ar' ? 'عرض المستند والمصدر المرجعي' : 'View Source Citation'}
+                <span className={`${isAssistantAr ? 'font-arabic' : 'font-sans'} ${isDarkMode ? 'text-blue-200' : 'text-[#00236f]'}`}>
+                  {isAssistantAr ? 'عرض المستند والمصدر المرجعي' : 'View Source Citation'}
                 </span>
               </div>
               <div className="flex items-center gap-2">
@@ -198,15 +200,15 @@ export const MessageItem: React.FC<MessageItemProps> = ({
                 }`}>
                   <div>
                     <span className={`text-[11px] block ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                      {language === 'ar' ? 'اسم الوثيقة الرسمية:' : 'Document Title:'}
+                      {isAssistantAr ? 'اسم الوثيقة الرسمية:' : 'Document Title:'}
                     </span>
-                    <strong className={`font-arabic ${isDarkMode ? 'text-white' : 'text-[#0b1c30]'}`}>
+                    <strong className={`${isRtl(message.citation.documentTitle) ? 'font-arabic' : 'font-sans'} ${isDarkMode ? 'text-white' : 'text-[#0b1c30]'}`}>
                       {message.citation.documentTitle}
                     </strong>
                   </div>
                   <div className="md:text-right">
                     <span className={`text-[11px] block ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                      {language === 'ar' ? 'تاريخ التوثيق:' : 'Retrieval Date:'}
+                      {isAssistantAr ? 'تاريخ التوثيق:' : 'Retrieval Date:'}
                     </span>
                     <span className={`font-mono ${isDarkMode ? 'text-slate-300' : 'text-slate-800'}`}>
                       {message.citation.retrievalDate}
@@ -225,7 +227,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({
                       {message.citation.articleReference || 'Article Reference'}
                     </span>
                     <span className={`text-[10px] italic ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
-                      {message.citation.chunkLabel || 'Placeholder chunk'}
+                      {message.citation.chunkLabel || (isAssistantAr ? 'النص القانوني المعتمد' : 'Verified Legal Text')}
                     </span>
                   </div>
                   <div className={`pr-28 font-arabic leading-relaxed ${
@@ -261,8 +263,8 @@ export const MessageItem: React.FC<MessageItemProps> = ({
                       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                         <path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
-                      <span className={language === 'ar' ? 'font-arabic' : ''}>
-                        {copied ? (language === 'ar' ? 'تم النسخ' : 'Copied') : (language === 'ar' ? 'نسخ النص' : 'Copy Text')}
+                      <span className={isAssistantAr ? 'font-arabic' : 'font-sans'}>
+                        {copied ? (isAssistantAr ? 'تم النسخ' : 'Copied') : (isAssistantAr ? 'نسخ النص' : 'Copy Text')}
                       </span>
                     </button>
 
@@ -274,8 +276,8 @@ export const MessageItem: React.FC<MessageItemProps> = ({
                       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                         <path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
-                      <span className={language === 'ar' ? 'font-arabic' : ''}>
-                        {language === 'ar' ? 'PDF فتح اللائحة' : 'Open PDF Regulation'}
+                      <span className={isAssistantAr ? 'font-arabic' : 'font-sans'}>
+                        {isAssistantAr ? 'PDF فتح اللائحة' : 'Open PDF Regulation'}
                       </span>
                     </button>
                   </div>
