@@ -21,89 +21,46 @@ export default function App() {
   const [language, setLanguage] = useState<'ar' | 'en'>('ar');
   const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
 
-  const [sessions, setSessions] = useState<ChatSession[]>([
-    {
-      id: 'session-current',
-      title: 'الجلسة الحالية',
-      updatedAt: '11:38 PM',
-      messages: INITIAL_MESSAGES,
-    },
-    {
-      id: 'session-2',
-      title: 'حساب المعدل التراكمي وسلم الدرجات',
-      updatedAt: 'Yesterday',
-      messages: [
-        {
-          id: 'prev-user-1',
-          sender: 'user',
-          timestamp: '02:15 PM',
-          content: 'كيف يتم توزيع الدرجات والمعدل التراكمي في كليات جامعة المرقب؟',
-          userName: 'طالب - جامعة المرقب',
-          userRole: 'Student',
-        },
-        {
-          id: 'prev-asst-1',
-          sender: 'assistant',
-          timestamp: '02:15 PM',
-          content: 'وفقاً للمادة (34) المحددة لسلم الدرجات والتقديرات المعتمد بكليات جامعة المرقب:',
-          bulletPoints: [
-            'ممتاز: 85% فما فوق (نقاط 4.00)، جيد جداً: 75% إلى أقل من 85% (نقاط 3.00 - 3.75).',
-            'جيد: 65% إلى أقل من 75% (نقاط 2.00 - 2.75)، مقبول: 50% إلى أقل من 65% (نقاط 1.00 - 1.75).',
-            'راسب: أقل من 50%، ويشترط لنيل الدرجة الجامعية ألا يقل المعدل التراكمي العام عن (2.00 / جيد) في بعض التخصصات الهندسية و (مقبول) في باقي الكليات.'
-          ],
-          verifiedSource: true,
-          citation: {
-            documentTitle: 'University Regulations / لائحة تنظيم شؤون التعليم العالي والجامعات',
-            retrievalDate: '2023-01-01',
-            articleReference: 'Article Reference',
-            chunkLabel: 'Grading scale chunk',
-            excerpt: '"المادة (34): يعتمد التقدير التراكمي العام لدرجات الطالب بناءً على مجموع النقاط مقسوماً على مجموع الساعات المعتمدة..."',
-            sourceUrl: 'http://example.com/doc',
-            pdfPage: 34,
-          }
+  const [sessions, setSessions] = useState<ChatSession[]>(() => {
+    const saved = localStorage.getItem('elmergib_sessions');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
         }
-      ]
-    },
-    {
-      id: 'session-3',
-      title: 'نسبة الغياب والحرمان من الامتحانات',
-      updatedAt: 'Sep 24',
-      messages: [
-        {
-          id: 'prev-user-2',
-          sender: 'user',
-          timestamp: '10:04 AM',
-          content: 'ما هي نسبة الغياب التي تؤدي للحرمان من الامتحان النهائي؟',
-          userName: 'طالب - جامعة المرقب',
-          userRole: 'Student',
-        },
-        {
-          id: 'prev-asst-2',
-          sender: 'assistant',
-          timestamp: '10:04 AM',
-          content: 'وفقاً للمادة (27) بخصوص الانضباط الأكاديمي ونسب الحضور بجامعة المرقب:',
-          bulletPoints: [
-            'يلتزم الطالب بحضور ما لا يقل عن 75% من المحاضرات والدروس المعملية المعتمدة لكل مقرر دراسي.',
-            'يُحرم الطالب من دخول الامتحان النهائي ويرصد له تقدير (محروم / 0) إذا تجاوزت نسبة غيابه 25% دون عذر مقبول.',
-            'الأعذار المرضية يجب أن تصادق عليها اللجنة الطبية المعتمدة التابعة لجامعة المرقب خلال أسبوع من تاريخ الغياب.'
-          ],
-          verifiedSource: true,
-          citation: {
-            documentTitle: 'University Regulations / لائحة تنظيم شؤون التعليم العالي والجامعات',
-            retrievalDate: '2023-01-01',
-            articleReference: 'Article Reference',
-            chunkLabel: 'Attendance bylaw chunk',
-            excerpt: '"المادة (27): يُحظر على الطالب دخول الامتحانات النهائية لأي مقرر تتجاوز نسبة غيابه فيه 25% دون موافقة مجلس الكلية..."',
-            sourceUrl: 'http://example.com/doc',
-            pdfPage: 27,
-          }
-        }
-      ]
+      } catch (e) {
+        console.error("Failed to parse saved sessions", e);
+      }
     }
-  ]);
+    return [
+      {
+        id: `session-${Date.now()}`,
+        title: 'جلسة جديدة',
+        updatedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        messages: [],
+      }
+    ];
+  });
 
-  const [activeSessionId, setActiveSessionId] = useState<string>('session-current');
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const [activeSessionId, setActiveSessionId] = useState<string>(() => {
+    const savedActive = localStorage.getItem('elmergib_active_session');
+    if (savedActive) {
+      return savedActive;
+    }
+    const savedSessions = localStorage.getItem('elmergib_sessions');
+    if (savedSessions) {
+      try {
+        const parsed = JSON.parse(savedSessions);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed[0].id;
+        }
+      } catch (e) {}
+    }
+    return sessions[0].id;
+  });
+  const [loadingSessionIds, setLoadingSessionIds] = useState<string[]>([]);
   const [activePdfCitation, setActivePdfCitation] = useState<Citation | null>(null);
   const [isPdfModalOpen, setIsPdfModalOpen] = useState<boolean>(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState<boolean>(false);
@@ -129,8 +86,19 @@ export default function App() {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [sessions, activeSessionId, isLoading]);
+  }, [sessions, activeSessionId, loadingSessionIds]);
 
+  // Save sessions to localStorage
+  useEffect(() => {
+    localStorage.setItem('elmergib_sessions', JSON.stringify(sessions));
+  }, [sessions]);
+
+  // Save active session to localStorage
+  useEffect(() => {
+    if (activeSessionId) {
+      localStorage.setItem('elmergib_active_session', activeSessionId);
+    }
+  }, [activeSessionId]);
   const currentSession = sessions.find(s => s.id === activeSessionId) || sessions[0];
 
   const handleShowToast = (msg: string) => {
@@ -200,38 +168,38 @@ export default function App() {
       });
     });
 
-    setIsLoading(true);
+    setLoadingSessionIds(prev => [...prev, activeSessionId]);
 
     try {
-      // Append instruction to force language in backend
-      const promptPayload = language === 'en' 
-        ? text + '\n\n[System directive: The user has requested English. You MUST respond entirely in English, no Arabic.]'
-        : text + '\n\n[System directive: The user has requested Arabic. You MUST respond entirely in Arabic, no English.]';
-
       const response = await fetch('http://localhost:8000/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ prompt: promptPayload }),
+        body: JSON.stringify({ prompt: text, language }),
       });
       const result = await response.json();
+
+      const isEnglish = result.language === 'en' || result.is_ar === false;
 
       const assistantReply: Message = {
         id: `asst-${Date.now()}`,
         sender: 'assistant',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         content: result.answer,
-        subNote: result.abstained ? (result.abstain_reason || 'تنبيه حدود الاختصاص') : '.This is a verified regulatory ruling from Elmergib University archives',
+        bulletPoints: result.bullet_points || result.bulletPoints,
+        subNote: result.abstained 
+          ? (result.abstain_reason || (isEnglish ? 'Notice: Outside University Bylaws Scope' : 'تنبيه: خارج نطاق لوائح جامعة المرقب'))
+          : (isEnglish ? 'Verified regulatory ruling from Elmergib University archives' : 'مستند رسمي معتمد من أرشيف لوائح جامعة المرقب'),
         verifiedSource: !result.abstained,
         citation: result.citation ? {
-          documentTitle: 'Elmergib Regulations',
+          documentTitle: result.citation.document_title || (isEnglish ? 'Elmergib University Higher Education Regulations' : 'لائحة تنظيم شؤون التعليم العالي والدراسة والامتحانات'),
           retrievalDate: result.citation.retrieved_at || new Date().toISOString().split('T')[0],
-          articleReference: result.citation.page_number ? `Page ${result.citation.page_number}` : 'Article Reference',
-          chunkLabel: 'Retrieved context',
+          articleReference: result.citation.article_reference || (result.citation.page_number ? (isEnglish ? `Article Ref • Page ${result.citation.page_number}` : `المادة المعتمدة • صفحة ${result.citation.page_number}`) : (isEnglish ? 'Regulation Ref' : 'المرجع المعتمد')),
+          chunkLabel: result.citation.chunk_label || (isEnglish ? 'Official Regulatory Excerpt' : 'النص القانوني المعتمد'),
           excerpt: result.citation.chunk_text || '',
-          sourceUrl: result.citation.source_url || '#',
-          pdfPage: 1,
+          sourceUrl: result.citation.source_url || 'https://elmergib.edu.ly/regulations',
+          pdfPage: result.citation.page_number || 28,
         } : undefined
       };
 
@@ -250,7 +218,7 @@ export default function App() {
       console.error("API Error", error);
       handleShowToast('Error connecting to backend');
     } finally {
-      setIsLoading(false);
+      setLoadingSessionIds(prev => prev.filter(id => id !== activeSessionId));
     }
   };
 
@@ -278,8 +246,18 @@ export default function App() {
           activeSessionId={activeSessionId}
           onSelectSession={handleSelectSession}
           onNewChat={handleNewChat}
+          onDeleteSession={(id) => {
+            setSessions(prev => prev.filter(s => s.id !== id));
+            if (activeSessionId === id) {
+              const remaining = sessions.filter(s => s.id !== id);
+              if (remaining.length > 0) {
+                setActiveSessionId(remaining[0].id);
+              } else {
+                handleNewChat();
+              }
+            }
+          }}
           isDarkMode={isDarkMode}
-          onToggleDarkMode={handleToggleDarkMode}
           isOpenMobile={mobileSidebarOpen}
           onCloseMobile={() => setMobileSidebarOpen(false)}
           language={language}
@@ -294,6 +272,7 @@ export default function App() {
           {/* BEGIN: ContentHeader */}
           <Header
             isDarkMode={isDarkMode}
+            onToggleDarkMode={handleToggleDarkMode}
             onOpenProfile={() => setIsProfileModalOpen(true)}
             onToggleMobileSidebar={() => setMobileSidebarOpen(prev => !prev)}
             onToggleDesktopSidebar={() => setDesktopSidebarOpen(prev => !prev)}
@@ -329,13 +308,6 @@ export default function App() {
                       : 'An retrieval system for official academic bylaws and university decisions issued by the Elmergib University Council and Student Affairs.'}
                   </p>
                 </div>
-                <div className="pt-2 w-full">
-                  <QuickPrompts 
-                    isDarkMode={isDarkMode} 
-                    onSelectPrompt={(text) => handleSendMessage(text)}
-                    language={language}
-                  />
-                </div>
               </div>
             ) : (
               currentSession.messages.map((msg) => (
@@ -345,12 +317,13 @@ export default function App() {
                   isDarkMode={isDarkMode}
                   onOpenPdf={handleOpenPdf}
                   onShowToast={handleShowToast}
+                  language={language}
                 />
               ))
             )}
 
             {/* Loading Indicator */}
-            {isLoading && (
+            {loadingSessionIds.includes(currentSession.id) && (
               <article className="max-w-4xl mx-auto flex items-start gap-3 animate-pulse">
                 <div className={`w-8 h-8 rounded-full border flex items-center justify-center shrink-0 mt-0.5 ${
                   isDarkMode ? 'bg-[#1b3a6b] border-blue-400/40 text-blue-200' : 'bg-blue-600 text-white'
@@ -393,7 +366,7 @@ export default function App() {
               {/* Prompt Input Field */}
               <ChatInput
                 onSendMessage={handleSendMessage}
-                isLoading={isLoading}
+                isLoading={loadingSessionIds.includes(currentSession.id)}
                 isDarkMode={isDarkMode}
                 onShowToast={handleShowToast}
                 language={language}

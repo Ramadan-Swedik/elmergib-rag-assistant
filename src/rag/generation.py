@@ -67,7 +67,7 @@ def generate_answer(
     def _call(m: str, options: dict) -> str:
         try:
             resp = ollama.chat(
-                model=m, messages=messages, keep_alive=0, options=options
+                model=m, messages=messages, keep_alive="1h", options=options
             )
             return resp["message"]["content"] or ""
         except ollama.ResponseError as e:
@@ -75,7 +75,7 @@ def generate_answer(
                 resp = ollama.chat(
                     model=fallback_model,
                     messages=messages,
-                    keep_alive=0,
+                    keep_alive="1h",
                     options=options,
                 )
                 return resp["message"]["content"] or ""

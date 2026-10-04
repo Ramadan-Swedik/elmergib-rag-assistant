@@ -7,9 +7,9 @@ interface SidebarProps {
   onSelectSession: (id: string) => void;
   onNewChat: () => void;
   isDarkMode: boolean;
-  onToggleDarkMode: () => void;
   isOpenMobile: boolean;
   onCloseMobile: () => void;
+  onDeleteSession: (id: string) => void;
   language?: 'ar' | 'en';
   isOpenDesktop?: boolean;
 }
@@ -20,9 +20,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onSelectSession,
   onNewChat,
   isDarkMode,
-  onToggleDarkMode,
   isOpenMobile,
   onCloseMobile,
+  onDeleteSession,
   language = 'ar',
   isOpenDesktop = true,
 }) => {
@@ -79,74 +79,58 @@ export const Sidebar: React.FC<SidebarProps> = ({
               {sessions.map((session) => {
                 const isActive = session.id === activeSessionId;
                 return (
-                  <button
-                    key={session.id}
-                    onClick={() => {
-                      onSelectSession(session.id);
-                      onCloseMobile();
-                    }}
-                    className={`w-full text-left flex items-center gap-2.5 px-3 py-2 text-xs rounded-lg font-medium transition-colors cursor-pointer ${
-                      isActive
-                        ? isDarkMode
-                          ? 'bg-[#182844] text-blue-300 border border-blue-500/20'
-                          : 'bg-[#dae2fd] text-[#00236f] border border-blue-300'
-                        : isDarkMode
-                          ? 'text-slate-400 hover:text-slate-200 hover:bg-[#131e33]'
-                          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-                    }`}
-                  >
-                    <svg 
-                      className={`w-4 h-4 shrink-0 ${isActive ? 'text-blue-500' : 'text-slate-400'}`} 
-                      fill="none" 
-                      stroke="currentColor" 
-                      strokeWidth="1.8" 
-                      viewBox="0 0 24 24"
+                  <div key={session.id} className="relative group w-full flex items-center justify-between">
+                    <button
+                      onClick={() => {
+                        onSelectSession(session.id);
+                        onCloseMobile();
+                      }}
+                      className={`w-full text-left flex items-center gap-2.5 px-3 py-2 text-xs rounded-lg font-medium transition-colors cursor-pointer ${
+                        isActive
+                          ? isDarkMode
+                            ? 'bg-[#182844] text-blue-300 border border-blue-500/20'
+                            : 'bg-[#dae2fd] text-[#00236f] border border-blue-300'
+                          : isDarkMode
+                            ? 'text-slate-400 hover:text-slate-200 hover:bg-[#131e33]'
+                            : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                      }`}
                     >
-                      <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                    <span className="truncate">
-                      {session.title === 'الجلسة الحالية'
-                        ? (language === 'ar' ? 'الجلسة الحالية' : 'Current Session')
-                        : session.title}
-                    </span>
-                  </button>
+                      <svg 
+                        className={`w-4 h-4 shrink-0 ${isActive ? 'text-blue-500' : 'text-slate-400'}`} 
+                        fill="none" 
+                        stroke="currentColor" 
+                        strokeWidth="1.8" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                      <span className="truncate pr-5">
+                        {session.title === 'الجلسة الحالية'
+                          ? (language === 'ar' ? 'الجلسة الحالية' : 'Current Session')
+                          : session.title}
+                      </span>
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDeleteSession(session.id);
+                      }}
+                      className={`absolute right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-md ${
+                        isDarkMode ? 'text-slate-400 hover:text-red-400 hover:bg-[#202c46]' : 'text-slate-500 hover:text-red-500 hover:bg-[#dae2fd]'
+                      }`}
+                      title={language === 'ar' ? 'حذف الجلسة' : 'Delete Session'}
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </button>
+                  </div>
                 );
               })}
             </nav>
           </div>
         </div>
 
-        {/* Bottom Settings / Theme Toggle */}
-        <div className={`p-3 border-t ${
-          isDarkMode ? 'border-[#1a253c]/70' : 'border-[#e2e8f0]'
-        }`}>
-          <button 
-            onClick={onToggleDarkMode}
-            className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs rounded-lg transition-colors cursor-pointer ${
-              isDarkMode 
-                ? 'text-slate-300 hover:bg-[#142036] hover:text-white' 
-                : 'text-slate-700 hover:bg-[#f1f5f9] hover:text-slate-900'
-            }`}
-            title="Toggle color theme"
-          >
-            {isDarkMode ? (
-              <>
-                <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-                <span>{language === 'ar' ? 'الوضع الداكن' : 'Dark mode'}</span>
-              </>
-            ) : (
-              <>
-                <svg className="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <circle cx="12" cy="12" r="5" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-                <span>{language === 'ar' ? 'الوضع الفاتح' : 'Light mode'}</span>
-              </>
-            )}
-          </button>
-        </div>
       </aside>
     </>
   );

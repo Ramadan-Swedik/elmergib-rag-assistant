@@ -8,6 +8,7 @@ interface HeaderProps {
   onToggleLanguage: () => void;
   isDesktopSidebarOpen?: boolean;
   onToggleDesktopSidebar?: () => void;
+  onToggleDarkMode?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -18,6 +19,7 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleLanguage,
   isDesktopSidebarOpen = true,
   onToggleDesktopSidebar,
+  onToggleDarkMode,
 }) => {
   return (
     <header 
@@ -75,15 +77,43 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-      {/* Actions: Language & Profile */}
-      <div className="flex items-center gap-3">
+      {/* Actions: Theme Toggle, Language & Profile */}
+      <div className="flex items-center gap-2 md:gap-3">
+        {/* Dark/Light mode toggle button */}
+        {onToggleDarkMode && (
+          <button
+            onClick={onToggleDarkMode}
+            title={isDarkMode 
+              ? (language === 'ar' ? 'التبديل إلى الوضع الفاتح' : 'Switch to Light Mode') 
+              : (language === 'ar' ? 'التبديل إلى الوضع الداكن' : 'Switch to Dark Mode')
+            }
+            className={`w-8 h-8 rounded-lg border flex items-center justify-center transition cursor-pointer ${
+              isDarkMode 
+                ? 'bg-[#1b2946] border-[#2b3d63] text-amber-400 hover:text-amber-300 hover:border-amber-400/50 hover:bg-[#203254]' 
+                : 'bg-[#eff4ff] border-[#cbd5e1] text-slate-700 hover:text-blue-900 hover:border-blue-400 hover:bg-white shadow-2xs'
+            }`}
+            aria-label="Toggle dark/light mode"
+          >
+            {isDarkMode ? (
+              <svg className="w-4 h-4 text-amber-400 transition-transform duration-200 hover:rotate-45" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="5" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            ) : (
+              <svg className="w-4 h-4 text-slate-700 transition-transform duration-200 hover:-rotate-12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            )}
+          </button>
+        )}
+
         <button
           onClick={onToggleLanguage}
           title={language === 'ar' ? 'Switch to English' : 'التبديل للعربية'}
           className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg border text-[11px] font-bold transition cursor-pointer ${
             isDarkMode 
               ? 'bg-[#1b2946] border-[#2b3d63] text-slate-300 hover:text-white hover:border-blue-400' 
-              : 'bg-[#eff4ff] border-[#cbd5e1] text-[#00236f] hover:text-blue-800 hover:border-blue-500'
+              : 'bg-[#eff4ff] border-[#cbd5e1] text-[#00236f] hover:text-blue-800 hover:border-blue-500 shadow-2xs'
           }`}
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -98,7 +128,7 @@ export const Header: React.FC<HeaderProps> = ({
           className={`w-8 h-8 rounded-full border flex items-center justify-center transition cursor-pointer ${
             isDarkMode 
               ? 'bg-[#1b2946] border-[#2b3d63] text-slate-300 hover:text-white hover:border-blue-400' 
-              : 'bg-[#eff4ff] border-[#cbd5e1] text-[#00236f] hover:text-blue-800 hover:border-blue-500'
+              : 'bg-[#eff4ff] border-[#cbd5e1] text-[#00236f] hover:text-blue-800 hover:border-blue-500 shadow-2xs'
           }`}
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
