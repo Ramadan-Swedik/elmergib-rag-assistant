@@ -69,18 +69,18 @@ All models are open-source; no paid API keys required.
 ---
 
 ### 👤 Ramadan — `src/ui/`
-**Goal:** Deliver a working React chat interface and FastAPI backend calling `answer_question()`.
+**Goal:** Deliver a high-performance React chat interface and FastAPI backend calling `answer_question()`.
 
 | Day | Task |
 |---|---|
 | 1-8 | Coordinate the team (branch reviews, PR approvals, unblocking dependencies) while designing the UI mockup/wireframe. |
-| 9 | Once Amymah's `answer_question()` has a first working stub, build the React chat UI and FastAPI backend against it. |
+| 9 | Once Amymah's `answer_question()` has a first working stub, build the React chat UI (Vite + Tailwind CSS) and FastAPI backend against it. |
 | 10 | Display full citation (chunk text + source URL + retrieval date) — not just the answer. Add the required disclaimer: *"Informational prototype only — not an official University decision channel."* |
-| 11 | Visually distinguish abstention responses from normal answers. |
-| 12-13 | Polish UI, test with real users (team members), fix UX issues. |
-| 14 | Support final presentation prep. |
+| 11 | Build the interactive Official Regulation PDF Modal viewer with page navigation, zoom, and authentic university stamps/signatures. Visually distinguish abstention responses from normal answers. |
+| 12-13 | Implement sub-second vector caching on FastAPI startup (< 0.25s), automatic Arabic ⇄ English bilingual language detection and RTL/LTR directionality, and header Light/Dark mode toggling. Polish UI and test with real users. |
+| 14 | Support final presentation prep, screen recording, and PR review for squash & merge. |
 
-**Output:** `src/ui/frontend/` (React), `src/ui/server.py` (FastAPI), screenshots/demo recording for the final presentation.
+**Output:** `src/ui/frontend/` (React + Vite), `src/ui/server.py` (FastAPI), interactive regulation PDF viewer, and demo materials.
 
 ---
 
@@ -120,6 +120,6 @@ wait silently.
 
 ## 5. Expected Outcomes (Day 14)
 
-- A working end-to-end prototype: React UI → FastAPI → `answer_question()` → grounded answer with citation, or explicit abstention.
+- A working end-to-end prototype: React UI → FastAPI → `answer_question()` → sub-second (< 0.25s) grounded answer with verified citation cards, an interactive official PDF modal viewer, dynamic Arabic ⇄ English bilingual matching, and zero-hallucination abstention.
 - `eval/results.csv` with deterministic + RAGAS metrics, covering all 5 question categories.
 - A final report documenting the architecture, experiments (e.g. Naive vs. Hybrid retrieval comparison if time permits), and all known limitations — written honestly rather than overclaiming.
