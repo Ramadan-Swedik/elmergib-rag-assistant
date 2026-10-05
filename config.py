@@ -42,7 +42,7 @@ VERIFICATION_LOG_PATH = DATABASE_DIR / "retrieval_verification.csv"
 MODEL_NAME = "BAAI/bge-m3"
 
 # ChromaDB Collection Name (Used consistently across indexing and search)
-COLLECTION_NAME = "university_rules"
+COLLECTION_NAME = "regulations_dense"
 
 # ==============================================================================
 # 4. Text Cleaning & Chunking Parameters
