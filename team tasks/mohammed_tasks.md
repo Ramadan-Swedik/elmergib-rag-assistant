@@ -17,13 +17,13 @@ You are strictly restricted to the `src/database/` directory and raw text cleani
 - **Day 1-2:** Collect all source PDFs into `data/raw/`. Register each document's official source URL and retrieval date in `data/document_sources.json`.
 - **Day 3-4:** Extract text (`pypdf`), normalize Arabic characters, filter out non-content pages (e.g., table of contents). Manually review every cleaned `.txt` output.
 - **Day 5-6:** Chunk text respecting sentence/clause boundaries (not fixed character cuts). Manually spot-check chunks for mid-sentence cuts.
-- **Day 7-8:** Build Dense index (`bge-m3` → `ChromaDB`) and BM25 index (`rank_bm25`, punctuation-aware tokenization). Tag every chunk with `doc_name`, `source_url`, `retrieved_at`, `page_number`.
+- **Day 7-8:** Build Dense index (`bge-m3` → `ChromaDB` collection `regulations_dense`) and BM25 index (`rank_bm25`, punctuation-aware tokenization). Tag every chunk with `doc_name`, `source_url`, `retrieved_at`, `page_number`.
 - **Day 9-10:** Run manual retrieval verification (5+ known-answer questions); log results to a persistent CSV. Fix any data-quality issues found.
 - **Day 11-14:** Support Amymah on retrieval integration issues; assist Omar with data-related evaluation questions.
 
 ## ✅ Expected Outcomes
 1. `data/processed/chunks.json`
-2. `src/database/vectorstore/` (ChromaDB instance)
+2. `src/database/vectorstore/` (ChromaDB collection `regulations_dense`)
 3. `src/database/bm25_index.pkl`
 
 **⚠️ Conflict Prevention:** Do not modify any files in `src/rag/`, `src/ui/`, or `eval/`. Your primary dependent is Amymah—her retrieval pipeline requires your index by Day 7-8. If you fall behind, notify the team immediately!

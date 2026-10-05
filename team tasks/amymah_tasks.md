@@ -14,7 +14,7 @@ You are strictly restricted to the `src/rag/` directory (retrieval logic, Ollama
 
 ## 📅 Workflow (14-Day Sprint)
 - **Day 5:** Install `Ollama`, pull `Qwen2.5:7b`. Install `bge-reranker-v2-m3`. Set up scaffolding while waiting for Mohammed's indexes.
-- **Day 6-7:** Implement hybrid retrieval: top-10 from BM25 + top-10 from Dense, merged via Reciprocal Rank Fusion (RRF).
+- **Day 6-7:** Implement hybrid retrieval: top-10 from BM25 + top-10 from Dense (ChromaDB collection `regulations_dense`), merged via Reciprocal Rank Fusion (RRF).
 - **Day 8:** Apply re-ranking on the fused top-10, keep the top-3.
 - **Day 9:** Build the Abstention Gate using a provisional confidence threshold.
 - **Day 10:** Build the grounded generation prompt (strict, context-only) and wire up `Qwen2.5` calls. Add a simple post-generation faithfulness check.
